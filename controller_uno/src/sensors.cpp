@@ -131,6 +131,13 @@ static void readAnalogSensors() {
 
 void begin(CalibrationData *calibration) {
   s_cal = calibration;
+
+#if defined(ARDUINO_ARCH_RENESAS)
+  // El cálculo de pH/TDS de este firmware usa escala ADC 0-1023.
+  // Forzamos 10 bits para que UNO R4 mantenga la misma base de calibración.
+  analogReadResolution(10);
+#endif
+
   pinMode(Pins::kLevelMin, INPUT_PULLUP);
   pinMode(Pins::kLevelMax, INPUT_PULLUP);
   Wire.begin();
