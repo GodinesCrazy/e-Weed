@@ -3,8 +3,9 @@
 
 namespace Actuators {
 
-static bool     s_relayOn[kNumRelays] = {false};
-static uint8_t  s_pins[kNumRelays]    = {
+static bool     s_relayOn[kNumRelays]    = {false};
+static uint32_t s_autoOffAt[kNumRelays]  = {0};
+static uint8_t  s_pins[kNumRelays]       = {
     Pins::kRelayPumpA,
     Pins::kRelayPumpB,
     Pins::kRelayPhUp,
@@ -22,7 +23,7 @@ static void writeHw(RelayId id, bool on) {
   digitalWrite(pin, on ? relayLevelOn() : relayLevelOff());
 }
 
-static bool isCriticalDosingRelay(RelayId id) {
+static bool isCriticalFluidRelay(RelayId id) {
   return id == RelayId::kPumpA || id == RelayId::kPumpB || id == RelayId::kPhUp ||
          id == RelayId::kPhDown || id == RelayId::kRecirculation;
 }
@@ -34,14 +35,19 @@ void begin() {
   for (uint8_t i = 0; i < kNumRelays; ++i) {
     pinMode(s_pins[i], OUTPUT);
     digitalWrite(s_pins[i], relayLevelOff());
-    s_relayOn[i] = false;
+    s_relayOn[i]   = false;
+    s_autoOffAt[i] = 0;
   }
 }
 
 bool getRelay(RelayId id) { return s_relayOn[static_cast<uint8_t>(id)]; }
 
 static void setStateOnly(RelayId id, bool on) {
-  s_relayOn[static_cast<uint8_t>(id)] = on;
+  const uint8_t idx = static_cast<uint8_t>(id);
+  s_relayOn[idx] = on;
+  if (!on) {
+    s_autoOffAt[idx] = 0;
+  }
   writeHw(id, on);
 }
 
@@ -65,8 +71,11 @@ void applyInterlocks(const SensorData &sensors) {
 }
 
 bool setRelay(RelayId id, bool on, const SensorData &sensors) {
+  const uint8_t idx = static_cast<uint8_t>(id);
+  s_autoOffAt[idx] = 0;
+
   if (on) {
-    if (sensors.levelMinActive && isCriticalDosingRelay(id)) {
+    if (sensors.levelMinActive && isCriticalFluidRelay(id)) {
       applyInterlocks(sensors);
       return false;
     }
@@ -90,8 +99,35 @@ bool setRelay(RelayId id, bool on, const SensorData &sensors) {
   return getRelay(id);
 }
 
+bool pulseRelay(RelayId id, uint32_t durationMs, const SensorData &sensors) {
+  if (durationMs < 100UL) {
+    durationMs = 100UL;
+  }
+  if (durationMs > 300000UL) {
+    durationMs = 300000UL;
+  }
+
+  if (!setRelay(id, true, sensors)) {
+    return false;
+  }
+
+  s_autoOffAt[static_cast<uint8_t>(id)] = millis() + durationMs;
+  return true;
+}
+
+void tick(const SensorData &sensors) {
+  const uint32_t now = millis();
+  for (uint8_t i = 0; i < kNumRelays; ++i) {
+    if (s_autoOffAt[i] != 0 && static_cast<int32_t>(now - s_autoOffAt[i]) >= 0) {
+      setStateOnly(static_cast<RelayId>(i), false);
+    }
+  }
+  applyInterlocks(sensors);
+}
+
 void allOutputsOff(const SensorData &sensors) {
   for (uint8_t i = 0; i < kNumRelays; ++i) {
+    s_autoOffAt[i] = 0;
     setStateOnly(static_cast<RelayId>(i), false);
   }
   applyInterlocks(sensors);
