@@ -1,6 +1,6 @@
 /**
  * @file main.cpp
- * @brief e-Weed controlador principal — Arduino Mega 2560 (Pro Mini u otras con ATmega2560).
+ * @brief e-Weed controlador principal — Arduino UNO R4 Minima.
  *
  * Orden de inicialización: relés apagados → EEPROM/calibración → sensores/RTC →
  * automatización (arranque en mantenimiento seguro) → UART USB + Serial1 (ESP32 HMI).
