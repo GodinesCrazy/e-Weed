@@ -1,57 +1,115 @@
-# e-Weed HMI Professional v2.0
+# e-Weed HMI Professional v3.0
 
-Plataforma hidropónica autónoma, inteligente y conectada basada en **ESP32-2432S028** (CYD) + **Arduino UNO R4**.
+Plataforma hidropónica autónoma, inteligente y conectada basada en **ESP32-2432S028 (CYD)** como HMI/cerebro principal y **Arduino UNO R4 Minima** como controlador oficial de I/O.
+
+## Objetivo del proyecto
+
+e-Weed busca centralizar el monitoreo, visualización y control de un sistema hidropónico/indoor mediante una arquitectura modular de dos controladores:
+
+- **ESP32-2432S028 (CYD):** interfaz táctil, UI LVGL, WiFi, API REST, almacenamiento local y motor de automatización.
+- **Arduino UNO R4 Minima:** lectura de sensores, control de relés, seguridad de actuadores y comunicación UART con el ESP32.
+
+El diseño separa la interfaz y la lógica de alto nivel del control físico de entradas/salidas, facilitando mantenimiento, expansión y diagnóstico.
 
 ## Arquitectura del sistema
 
-```
-ESP32 (HMI + Cerebro)                     UNO R4 (Controlador I/O)
+```text
+ESP32 (HMI + Cerebro)                     UNO R4 Minima (Controlador I/O)
 ┌─────────────────────┐    UART 115200    ┌────────────────────┐
-│  LVGL UI 320×240    │◄────────────────►│  Sensores (DHT22,  │
-│  WiFi AP/STA        │   GPIO16/17       │  PH-4502C, DS3231) │
-│  REST API :80       │                   │  9 Relés            │
-│  Automation Engine  │                   │  Nivel agua         │
-│  Data Logger        │                   │  Buzzer             │
+│  LVGL UI 320×240    │◄────────────────►│  Sensores          │
+│  WiFi AP/STA        │   GPIO16/17       │  Relés             │
+│  REST API :80       │                   │  Nivel agua        │
+│  Automation Engine  │                   │  RTC               │
+│  Data Logger        │                   │  Buzzer            │
 └─────────────────────┘                   └────────────────────┘
          │
     WiFi / HTTP
          │
-   App Móvil / Browser
+   App móvil / Browser
 ```
+
+## Hardware oficial
+
+### Controlador principal
+
+- ESP32-2432S028 / CYD.
+- Pantalla TFT ILI9341 320×240.
+- Touch XPT2046.
+- LittleFS para assets/configuración.
+- WiFi AP/STA.
+
+### Controlador I/O oficial
+
+- Arduino UNO R4 Minima.
+- Sensores conectados al controlador I/O.
+- Relés de actuación.
+- Comunicación UART hacia ESP32 HMI.
+
+> Nota: el modelo oficial del controlador secundario es **Arduino UNO R4 Minima**. No se mantiene soporte oficial para Mega 2560 en esta versión del repositorio.
+
+## Funciones principales
+
+- Interfaz táctil LVGL.
+- Dashboard local de sensores.
+- Comunicación UART bidireccional ESP32 ↔ UNO R4.
+- Motor de automatización con histéresis.
+- Control de actuadores en modo manual/automático.
+- Registro histórico en LittleFS.
+- WiFi en modo AP/STA.
+- API REST local.
+- Configuración persistente.
+- Alarmas y estados de salud del sistema.
+
+## Variables y módulos contemplados
+
+- pH.
+- EC/TDS/PPM.
+- Temperatura de agua.
+- Temperatura/humedad ambiental.
+- Nivel mínimo/máximo de agua.
+- Bombas peristálticas 12V.
+- Oxigenación.
+- Iluminación.
+- Ventilación/intracción/extracción.
+- Buzzer/alertas.
 
 ## Estructura del proyecto
 
-```
+```text
 src/
-├── main.cpp                    # Entry point + 5 tareas FreeRTOS
-├── hal_setup.cpp/.h            # TFT + Touch + LVGL init (320×240)
+├── main.cpp                    # Entry point + tareas FreeRTOS
+├── hal_setup.cpp/.h            # TFT + Touch + LVGL init
 ├── data_model.cpp/.h           # Modelo compartido thread-safe
-├── uart_comm.cpp/.h            # Protocolo UART → UNO R4
 ├── assets_fs.cpp/.h            # LittleFS + PNG decoder
 ├── lv_conf.h                   # Config LVGL
-├── generated_assets.cpp        # Assets embebidos (auto-generado)
+├── generated_assets.cpp        # Assets embebidos
 ├── automation/
 │   ├── automation_engine.h
-│   └── automation_engine.cpp   # Motor IA simple con histéresis
+│   └── automation_engine.cpp   # Motor de automatización
+├── comms/
+│   ├── uart_comm.h
+│   └── uart_comm.cpp           # Comunicación UART con UNO R4
 ├── network/
 │   ├── network_manager.h
 │   └── network_manager.cpp     # WiFi + HTTP REST API
 ├── storage/
+│   ├── settings_store.h
+│   ├── settings_store.cpp
 │   ├── storage_manager.h
-│   └── storage_manager.cpp     # Ring buffer + CSV en LittleFS
+│   └── storage_manager.cpp     # Configuración + data logger
 └── ui/
     ├── ui_manager.h
-    ├── ui_manager.cpp          # 11 pantallas LVGL profesionales
+    ├── ui_manager.cpp          # Pantallas LVGL
     ├── themes.h
     └── themes.cpp
 
 include/
-├── app_assets.h                # Rutas de assets S:/
-└── generated_assets.h          # Descriptores de imágenes
+├── app_assets.h
+└── generated_assets.h
 
-controller_uno/                 # Subproyecto Arduino UNO R4
-├── platformio.ini
-└── src/main.cpp
+controller_uno/
+├── platformio.ini              # Target oficial: Arduino UNO R4 Minima
+└── src/main.cpp                # Firmware del controlador I/O
 ```
 
 ## Pantallas de la interfaz
@@ -59,56 +117,30 @@ controller_uno/                 # Subproyecto Arduino UNO R4
 | # | Pantalla | Descripción |
 |---|----------|-------------|
 | 0 | Boot Test | Pantalla de diagnóstico |
-| 1 | **Splash** | Animación de arranque → auto-avanza al Dashboard |
-| 2 | **Dashboard** | Vista rápida 6 sensores + estado salud + navegación |
-| 3 | Menú Principal | Grid 4×2 con acceso a todas las secciones |
-| 4 | Sensores | Lectura detallada con rangos ideales por etapa |
-| 5 | Etapas | 5 etapas de cultivo con perfiles configurables |
-| 6 | Actuadores | Control manual/auto de 6 actuadores + selector de modo |
-| 7 | Alertas | Centro de alarmas con ACK |
-| 8 | Calibración | Ajuste pH (2 puntos) + offsets de sensores |
-| 9 | Ajustes | Tema oscuro/claro + estadísticas UART |
-| 10 | **WiFi/API** | Estado de red + documentación de endpoints |
+| 1 | Splash | Animación de arranque |
+| 2 | Dashboard | Vista rápida de sensores y estado |
+| 3 | Menú Principal | Navegación general |
+| 4 | Sensores | Lectura detallada |
+| 5 | Etapas | Perfiles configurables |
+| 6 | Actuadores | Control manual/auto |
+| 7 | Alertas | Centro de alarmas |
+| 8 | Calibración | Ajustes de sensores |
+| 9 | Ajustes | Tema, UART y configuración |
+| 10 | WiFi/API | Estado de red y endpoints |
 
-## Tareas FreeRTOS
+## Tareas FreeRTOS del ESP32
 
-| Tarea | Core | Stack | Prioridad | Función |
-|-------|------|-------|-----------|---------|
-| UI | 1 | 10KB | 2 | LVGL rendering + actualización pantallas |
-| UART | 0 | 4KB | 1 | Comunicación bidireccional con UNO R4 |
-| Automation | 1 | 3KB | 1 | Motor de automatización con histéresis |
-| Network | 0 | 8KB | 1 | WiFi + servidor HTTP REST |
-| Storage | 1 | 4KB | 1 | Registro histórico en LittleFS |
+| Tarea | Core | Función |
+|-------|------|---------|
+| UI | 1 | LVGL rendering + actualización de pantallas |
+| UART | 0 | Comunicación bidireccional con UNO R4 |
+| Automation | 1 | Evaluación de reglas automáticas |
+| Network | 0 | WiFi + servidor HTTP REST |
+| Storage | 1 | Registro histórico y persistencia |
 
-## Motor de automatización
+## API REST local
 
-### Reglas con histéresis
-
-| Parámetro | Acción si BAJO | Acción si ALTO | Histéresis |
-|-----------|----------------|----------------|------------|
-| pH | Dosificador alcalino (PHU) | Dosificador ácido (PHD) | ±0.15 |
-| EC/TDS | Nutrientes A+B (PA, PB) | Diluir (PIN) | ±50 ppm |
-| Temp. aire | -- | Ventiladores (INT, EXT) | 1.0°C |
-| Humedad | Recirculación (REC) | -- | 3.0% |
-| Nivel agua | Llenado (PIN) | Stop | Sensores min/max |
-
-### Modos de operación
-
-- **AUTO** (0): Automatización completa según perfil de etapa activa
-- **MANUAL** (1): Sin intervención automática, solo monitoreo
-- **HYBRID** (2): Automatización parcial (reservado para expansión)
-
-### Niveles de salud del sistema
-
-- **NORMAL** (verde): Todos los parámetros dentro de rango
-- **WARNING** (amarillo): Algún parámetro fuera de rango ideal
-- **ALERT** (rojo): Parámetro crítico o alarma activa
-
-## API REST (WiFi)
-
-### Conexión WiFi
-
-**Modo por defecto:** Access Point
+### Modo WiFi por defecto
 
 | Parámetro | Valor |
 |-----------|-------|
@@ -116,228 +148,87 @@ controller_uno/                 # Subproyecto Arduino UNO R4
 | Password | `eweed1234` |
 | IP | `192.168.4.1` |
 
-Si se configura SSID de red WiFi → se conecta como estación (STA) con fallback automático a AP.
+Si se configura una red WiFi externa, el ESP32 puede funcionar en modo estación con fallback a Access Point.
 
-### Endpoints
+### Endpoints principales
 
 #### `GET /api/status`
-Estado completo del sistema.
 
-```json
-{
-  "ph": 5.82,
-  "ec": 800,
-  "temp_water": 21.5,
-  "temp_air": 23.4,
-  "humidity": 62.0,
-  "level_min": false,
-  "level_max": false,
-  "health": 0,
-  "stage": 1,
-  "alarm": 0,
-  "auto_mode": true,
-  "maintenance": false,
-  "uart": true,
-  "wifi_ip": "192.168.4.1",
-  "uptime": 3600,
-  "heap": 180000
-}
-```
+Devuelve el estado completo del sistema.
 
 #### `GET /api/sensors`
-Solo lecturas de sensores.
 
-```json
-{
-  "ph": 5.82,
-  "ec": 800,
-  "temp_water": 21.5,
-  "temp_air": 23.4,
-  "humidity": 62.0,
-  "level_min": false,
-  "level_max": false
-}
-```
-
-#### `GET /api/actuators`
-Estado de todos los actuadores.
-
-```json
-{
-  "light": true,
-  "intractor": false,
-  "extractor": true,
-  "recirculation": false,
-  "pump_in": false,
-  "pump_a": false,
-  "pump_b": false,
-  "ph_up": false,
-  "ph_down": false
-}
-```
-
-#### `POST /api/actuators`
-Control remoto de actuadores.
-
-```json
-{"actuator": "LUZ", "state": true}
-```
-
-Claves válidas: `LUZ`, `INT`, `EXT`, `REC`, `PIN`, `PA`, `PB`, `PHU`, `PHD`
-
-#### `GET /api/history`
-Últimos 50 registros históricos.
-
-```json
-{
-  "records": [
-    {"t": 300000, "ph": 5.82, "ec": 800, "tw": 21.5, "ta": 23.4, "ha": 62.0, "l": 0, "h": 0}
-  ],
-  "total": 288
-}
-```
+Devuelve solo las lecturas de sensores.
 
 #### `GET /api/config`
-Configuración del motor de automatización.
 
-```json
-{
-  "mode": 1,
-  "ph_hysteresis": 0.15,
-  "ec_hysteresis": 50,
-  "temp_hysteresis": 1.0,
-  "hum_hysteresis": 3.0,
-  "min_dose_interval_ms": 30000,
-  "dose_duration_ms": 3000,
-  "eval_interval_ms": 2000
-}
-```
+Devuelve configuración activa.
 
 #### `POST /api/config`
-Cambiar modo de automatización.
 
-```json
-{"mode": 0}
-```
+Actualiza parámetros de configuración.
 
-Valores: `0` = manual, `1` = auto, `2` = hybrid
+#### `POST /api/actuator`
 
-### CORS
+Permite accionar salidas en modo autorizado.
 
-Todos los endpoints incluyen headers CORS (`Access-Control-Allow-Origin: *`) para consumo desde apps web/móvil.
+## Compilación
 
-## Ejemplo: consumo desde app móvil
+### ESP32 HMI
 
-### JavaScript / React Native / Expo
-
-```javascript
-const API_BASE = 'http://192.168.4.1';
-
-// Leer estado
-const response = await fetch(`${API_BASE}/api/status`);
-const data = await response.json();
-console.log(`pH: ${data.ph}  EC: ${data.ec}  Salud: ${data.health}`);
-
-// Encender luz
-await fetch(`${API_BASE}/api/actuators`, {
-  method: 'POST',
-  headers: { 'Content-Type': 'application/json' },
-  body: JSON.stringify({ actuator: 'LUZ', state: true })
-});
-
-// Cambiar a modo automático
-await fetch(`${API_BASE}/api/config`, {
-  method: 'POST',
-  headers: { 'Content-Type': 'application/json' },
-  body: JSON.stringify({ mode: 1 })
-});
-```
-
-### cURL
+Desde la raíz del proyecto:
 
 ```bash
-# Status
-curl http://192.168.4.1/api/status
-
-# Encender bomba
-curl -X POST http://192.168.4.1/api/actuators \
-  -H "Content-Type: application/json" \
-  -d '{"actuator":"PIN","state":true}'
-
-# Historial
-curl http://192.168.4.1/api/history
-```
-
-## Perfiles de etapas de cultivo
-
-| Etapa | pH | PPM | T°Agua | T°Aire | Humedad | Foto |
-|-------|-----|-----|--------|--------|---------|------|
-| 1. Germinación | 5.8-6.1 | 200-450 | 20-22°C | 22-26°C | 65-75% | 18/6 |
-| 2. Vegetativa | 5.8-6.2 | 500-900 | 19-22°C | 22-28°C | 55-70% | 18/6 |
-| 3. Pre-floración | 5.8-6.2 | 800-1100 | 19-21°C | 21-27°C | 45-60% | 12/12 |
-| 4. Floración | 5.9-6.3 | 900-1300 | 18-21°C | 20-26°C | 40-50% | 12/12 |
-| 5. Maduración | 5.8-6.2 | 150-400 | 18-20°C | 19-25°C | 40-50% | 12/12 |
-
-## Compilación y flasheo
-
-### Requisitos
-
-- [PlatformIO](https://platformio.org/) (CLI o VSCode extension)
-- ESP32-2432S028 (CYD) conectado por USB
-
-### Comandos
-
-```bash
-# Compilar firmware
 pio run
-
-# Flashear firmware
-pio run --target upload
-
-# Compilar y subir filesystem (LittleFS con assets)
-pio run --target buildfs
-pio run --target uploadfs
-
-# Monitor serial
+pio run -t upload
 pio device monitor
 ```
 
-### Subproyecto UNO R4
+### Arduino UNO R4 Minima
+
+Desde la carpeta del controlador:
 
 ```bash
 cd controller_uno
-pio run --target upload
+pio run -e uno_r4_minima
+pio run -e uno_r4_minima -t upload
+pio device monitor -e uno_r4_minima
 ```
 
-## Conexiones físicas
+## Configuración PlatformIO
 
-Ver [conexiones.md](conexiones.md) para el diagrama de cableado completo.
+El proyecto principal usa:
 
-### Resumen UART
+- `platform = espressif32`
+- `board = esp32dev`
+- `framework = arduino`
+- `board_build.filesystem = littlefs`
+- `lvgl/lvgl`
+- `TFT_eSPI`
+- `XPT2046_Touchscreen`
 
-| ESP32 | UNO R4 |
-|-------|--------|
-| GPIO16 (RX) | TX (Serial1) |
-| GPIO17 (TX) | RX (Serial1) |
-| GND | GND |
+El controlador I/O usa:
 
-## Registro histórico
+- `platform = renesas-ra`
+- `board = uno_r4_minima`
+- `framework = arduino`
 
-- **Buffer circular** en RAM: 288 registros (24h a intervalos de 5 min)
-- **Persistencia**: Flush automático a `/history.csv` en LittleFS cada 60s
-- **Formato CSV**: `timestamp,ph,tds,tw,ta,ha,level,health`
-- **API**: Últimos 50 registros disponibles vía `GET /api/history`
+## Seguridad eléctrica
 
-## Recursos del sistema (compilado)
+Este proyecto puede controlar cargas externas mediante relés. Las cargas de red eléctrica, como iluminación, intractores o extractores de 220V, deben aislarse completamente de la electrónica de bajo voltaje.
 
-| Recurso | Uso | Disponible |
-|---------|-----|------------|
-| RAM | 36.3% (119KB) | 320KB |
-| Flash | 83.8% (1.07MB) | 1.31MB |
-| Tareas FreeRTOS | 5 | -- |
-| Pantallas LVGL | 11 | -- |
-| Endpoints API | 6 | -- |
+Recomendaciones mínimas:
+
+- Separar físicamente 220V de 5V/3.3V/12V.
+- Usar módulos de relé/SSR adecuados para la carga real.
+- Añadir fusibles, borneras seguras y gabinete aislado.
+- No manipular red eléctrica energizada.
+- Validar el cableado con una persona calificada antes de uso continuo.
+
+## Estado actual
+
+Repositorio inicial funcional para desarrollo de firmware ESP32 + Arduino UNO R4 Minima. La base incluye HMI, comunicación UART, automatización, almacenamiento, WiFi/API y controlador I/O separado.
 
 ## Licencia
 
-Proyecto privado. Todos los derechos reservados.
+Proyecto privado/personal en desarrollo. Definir licencia antes de distribución pública o uso comercial.
