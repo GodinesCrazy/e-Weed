@@ -4,7 +4,7 @@
 /** Firmware HMI ESP32 (semver) */
 #define EWEED_HMI_VERSION "3.0.0"
 
-/** Versión del protocolo de línea STS/CMD/ACK/ERR/ALM documentada junto al Mega */
+/** Versión del protocolo de línea STS/CMD/ACK/ERR/ALM documentada junto al UNO R4 */
 #define EWEED_UART_PROTOCOL_VERSION "2.1"
 
 /** Revisión de paquete de assets en LittleFS (incrementar si cambia data/assets) */
