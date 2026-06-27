@@ -22,6 +22,11 @@ static void writeHw(RelayId id, bool on) {
   digitalWrite(pin, on ? relayLevelOn() : relayLevelOff());
 }
 
+static bool isCriticalDosingRelay(RelayId id) {
+  return id == RelayId::kPumpA || id == RelayId::kPumpB || id == RelayId::kPhUp ||
+         id == RelayId::kPhDown || id == RelayId::kRecirculation;
+}
+
 bool relayLevelOn() { return HwConfig::kRelayActiveHigh ? HIGH : LOW; }
 bool relayLevelOff() { return HwConfig::kRelayActiveHigh ? LOW : HIGH; }
 
@@ -52,6 +57,7 @@ void applyInterlocks(const SensorData &sensors) {
     setStateOnly(RelayId::kPumpB, false);
     setStateOnly(RelayId::kPhUp, false);
     setStateOnly(RelayId::kPhDown, false);
+    setStateOnly(RelayId::kRecirculation, false);
   }
   if (sensors.levelMaxActive) {
     setStateOnly(RelayId::kWaterIn, false);
@@ -59,6 +65,26 @@ void applyInterlocks(const SensorData &sensors) {
 }
 
 bool setRelay(RelayId id, bool on, const SensorData &sensors) {
+  if (on) {
+    if (sensors.levelMinActive && isCriticalDosingRelay(id)) {
+      applyInterlocks(sensors);
+      return false;
+    }
+    if (sensors.levelMaxActive && id == RelayId::kWaterIn) {
+      applyInterlocks(sensors);
+      return false;
+    }
+    if (id == RelayId::kPumpA) {
+      setStateOnly(RelayId::kPumpB, false);
+    } else if (id == RelayId::kPumpB) {
+      setStateOnly(RelayId::kPumpA, false);
+    } else if (id == RelayId::kPhUp) {
+      setStateOnly(RelayId::kPhDown, false);
+    } else if (id == RelayId::kPhDown) {
+      setStateOnly(RelayId::kPhUp, false);
+    }
+  }
+
   setStateOnly(id, on);
   applyInterlocks(sensors);
   return getRelay(id);
