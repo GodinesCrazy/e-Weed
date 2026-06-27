@@ -69,7 +69,7 @@ struct WiFiConfig {
 
 struct SystemState {
     float ph          = 0.0f;
-    /** PPM/TDS entero derivado de telemetría Mega */
+    /** PPM/TDS entero derivado de telemetría del controlador UNO R4 */
     int   tds         = 0;
     float temp_water  = 0.0f;
     /** Temperatura NTC modulo PH-4502C (pin TO), °C */
@@ -91,7 +91,7 @@ struct SystemState {
     bool state_pump_b        = false;
     bool state_ph_up         = false;
     bool state_ph_down       = false;
-    /** Buzzer / relé BUZ (Mega kRelayNames) */
+    /** Buzzer / relé BUZ del controlador UNO R4 */
     bool state_buzzer        = false;
     bool auto_mode           = false;
     bool maintenance_mode    = false;
@@ -101,19 +101,20 @@ struct SystemState {
     char last_action[64]   = "Esperando telemetria UART";
     int  current_alarm = 0;
     char alarm_message[64] = "Todo dentro de parametros";
-    /** FSM del Mega (MachineState); 255 = desconocido */
+    /** FSM del controlador I/O; 255 = desconocido. Nombre legado preservado por compatibilidad. */
     uint8_t mega_machine_state = 255;
+    /** Contadores del controlador I/O. Nombres legados preservados por compatibilidad. */
     uint8_t ph_corrections_mega = 0;
     uint8_t tds_corrections_mega = 0;
     /** Hora RTC del controlador "HH:MM:SS" o vacío */
     char controller_clock[12] = "";
 
-    /** DHT22 en UNO; si el STS no trae DHT= se asume true (compat firmware antiguo). */
+    /** DHT22 en UNO R4; si el STS no trae DHT= se asume true (compat firmware antiguo). */
     bool     dht_online       = true;
-    /** PHOK/TDSOK/TWOK en STS (UNO); sin clave se asume true (compat). */
+    /** PHOK/TDSOK/TWOK en STS (UNO R4); sin clave se asume true (compat). */
     bool     ph_probe_ok      = true;
     bool     tds_probe_ok     = true;
-    /** TWOK: DS18 o NTC To validos en UNO. */
+    /** TWOK: DS18 o NTC To validos en UNO R4. */
     bool     tw_probe_ok      = true;
 
     bool     uart_connected   = false;
@@ -151,7 +152,7 @@ struct SystemSettings {
     bool  auto_mode        = true;
     bool  maintenance_mode = false;
     bool  dark_theme       = true;
-    /** Ajustes locales (NVS); el Mega aplica sus propios perfiles en AUTO */
+    /** Ajustes locales (NVS); el controlador UNO R4 aplica perfiles/seguridad en AUTO */
     uint16_t safety_ppm_ceiling = 2500;
     float    safety_ph_ceiling  = 8.5f;
     uint32_t recirc_on_sec      = 600;
