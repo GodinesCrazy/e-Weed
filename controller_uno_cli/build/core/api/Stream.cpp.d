@@ -1,0 +1,8 @@
+C:\e-Weed\controller_uno_cli\build\core\api\Stream.cpp.o: \
+ C:\Users\ivanm\AppData\Local\Arduino15\packages\arduino\hardware\renesas_uno\1.4.1\cores\arduino\api\Stream.cpp \
+ C:\Users\ivanm\AppData\Local\Arduino15\packages\arduino\hardware\renesas_uno\1.4.1\cores\arduino\api\Common.h \
+ C:\Users\ivanm\AppData\Local\Arduino15\packages\arduino\hardware\renesas_uno\1.4.1\cores\arduino\api\Stream.h \
+ C:\Users\ivanm\AppData\Local\Arduino15\packages\arduino\hardware\renesas_uno\1.4.1\cores\arduino\api\Print.h \
+ C:\Users\ivanm\AppData\Local\Arduino15\packages\arduino\hardware\renesas_uno\1.4.1\cores\arduino\api\String.h \
+ C:\Users\ivanm\AppData\Local\Arduino15\packages\arduino\hardware\renesas_uno\1.4.1\cores\arduino\api\deprecated-avr-comp/avr/pgmspace.h \
+ C:\Users\ivanm\AppData\Local\Arduino15\packages\arduino\hardware\renesas_uno\1.4.1\cores\arduino\api\Printable.h

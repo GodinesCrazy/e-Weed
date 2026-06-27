@@ -1,0 +1,456 @@
+{
+  "source": "reference/master_assets_sheet.png",
+  "asset_count": 32,
+  "runtime_root": "/assets",
+  "rgb565_root": null,
+  "assets": [
+    {
+      "name": "logo_main_240x120.png",
+      "group": "logo",
+      "path": "/assets/logo_main_240x120.png",
+      "project_path": "data/assets/logo_main_240x120.png",
+      "legacy_path": "/assets/logo/logo_main_240x120.png",
+      "legacy_project_path": "data/assets/logo/logo_main_240x120.png",
+      "size": {
+        "width": 240,
+        "height": 120
+      },
+      "rgb565_bytes": 57600,
+      "rgb565_path": null
+    },
+    {
+      "name": "splash_screen_320x240.png",
+      "group": "backgrounds",
+      "path": "/assets/splash_screen_320x240.png",
+      "project_path": "data/assets/splash_screen_320x240.png",
+      "legacy_path": "/assets/backgrounds/splash_screen_320x240.png",
+      "legacy_project_path": "data/assets/backgrounds/splash_screen_320x240.png",
+      "size": {
+        "width": 320,
+        "height": 240
+      },
+      "rgb565_bytes": 153600,
+      "rgb565_path": null
+    },
+    {
+      "name": "background_main_320x240.png",
+      "group": "backgrounds",
+      "path": "/assets/background_main_320x240.png",
+      "project_path": "data/assets/background_main_320x240.png",
+      "legacy_path": "/assets/backgrounds/background_main_320x240.png",
+      "legacy_project_path": "data/assets/backgrounds/background_main_320x240.png",
+      "size": {
+        "width": 320,
+        "height": 240
+      },
+      "rgb565_bytes": 153600,
+      "rgb565_path": null
+    },
+    {
+      "name": "menu_stages_64.png",
+      "group": "menu",
+      "path": "/assets/menu_stages_64.png",
+      "project_path": "data/assets/menu_stages_64.png",
+      "legacy_path": "/assets/menu/menu_stages_64.png",
+      "legacy_project_path": "data/assets/menu/menu_stages_64.png",
+      "size": {
+        "width": 64,
+        "height": 64
+      },
+      "rgb565_bytes": 8192,
+      "rgb565_path": null
+    },
+    {
+      "name": "menu_live_64.png",
+      "group": "menu",
+      "path": "/assets/menu_live_64.png",
+      "project_path": "data/assets/menu_live_64.png",
+      "legacy_path": "/assets/menu/menu_live_64.png",
+      "legacy_project_path": "data/assets/menu/menu_live_64.png",
+      "size": {
+        "width": 64,
+        "height": 64
+      },
+      "rgb565_bytes": 8192,
+      "rgb565_path": null
+    },
+    {
+      "name": "menu_calibration_64.png",
+      "group": "menu",
+      "path": "/assets/menu_calibration_64.png",
+      "project_path": "data/assets/menu_calibration_64.png",
+      "legacy_path": "/assets/menu/menu_calibration_64.png",
+      "legacy_project_path": "data/assets/menu/menu_calibration_64.png",
+      "size": {
+        "width": 64,
+        "height": 64
+      },
+      "rgb565_bytes": 8192,
+      "rgb565_path": null
+    },
+    {
+      "name": "menu_settings_64.png",
+      "group": "menu",
+      "path": "/assets/menu_settings_64.png",
+      "project_path": "data/assets/menu_settings_64.png",
+      "legacy_path": "/assets/menu/menu_settings_64.png",
+      "legacy_project_path": "data/assets/menu/menu_settings_64.png",
+      "size": {
+        "width": 64,
+        "height": 64
+      },
+      "rgb565_bytes": 8192,
+      "rgb565_path": null
+    },
+    {
+      "name": "menu_alarms_64.png",
+      "group": "menu",
+      "path": "/assets/menu_alarms_64.png",
+      "project_path": "data/assets/menu_alarms_64.png",
+      "legacy_path": "/assets/menu/menu_alarms_64.png",
+      "legacy_project_path": "data/assets/menu/menu_alarms_64.png",
+      "size": {
+        "width": 64,
+        "height": 64
+      },
+      "rgb565_bytes": 8192,
+      "rgb565_path": null
+    },
+    {
+      "name": "menu_maintenance_64.png",
+      "group": "menu",
+      "path": "/assets/menu_maintenance_64.png",
+      "project_path": "data/assets/menu_maintenance_64.png",
+      "legacy_path": "/assets/menu/menu_maintenance_64.png",
+      "legacy_project_path": "data/assets/menu/menu_maintenance_64.png",
+      "size": {
+        "width": 64,
+        "height": 64
+      },
+      "rgb565_bytes": 8192,
+      "rgb565_path": null
+    },
+    {
+      "name": "stage_1_64.png",
+      "group": "stages",
+      "path": "/assets/stage_1_64.png",
+      "project_path": "data/assets/stage_1_64.png",
+      "legacy_path": "/assets/stages/stage_1_64.png",
+      "legacy_project_path": "data/assets/stages/stage_1_64.png",
+      "size": {
+        "width": 64,
+        "height": 64
+      },
+      "rgb565_bytes": 8192,
+      "rgb565_path": null
+    },
+    {
+      "name": "stage_2_64.png",
+      "group": "stages",
+      "path": "/assets/stage_2_64.png",
+      "project_path": "data/assets/stage_2_64.png",
+      "legacy_path": "/assets/stages/stage_2_64.png",
+      "legacy_project_path": "data/assets/stages/stage_2_64.png",
+      "size": {
+        "width": 64,
+        "height": 64
+      },
+      "rgb565_bytes": 8192,
+      "rgb565_path": null
+    },
+    {
+      "name": "stage_3_64.png",
+      "group": "stages",
+      "path": "/assets/stage_3_64.png",
+      "project_path": "data/assets/stage_3_64.png",
+      "legacy_path": "/assets/stages/stage_3_64.png",
+      "legacy_project_path": "data/assets/stages/stage_3_64.png",
+      "size": {
+        "width": 64,
+        "height": 64
+      },
+      "rgb565_bytes": 8192,
+      "rgb565_path": null
+    },
+    {
+      "name": "stage_4_64.png",
+      "group": "stages",
+      "path": "/assets/stage_4_64.png",
+      "project_path": "data/assets/stage_4_64.png",
+      "legacy_path": "/assets/stages/stage_4_64.png",
+      "legacy_project_path": "data/assets/stages/stage_4_64.png",
+      "size": {
+        "width": 64,
+        "height": 64
+      },
+      "rgb565_bytes": 8192,
+      "rgb565_path": null
+    },
+    {
+      "name": "stage_5_64.png",
+      "group": "stages",
+      "path": "/assets/stage_5_64.png",
+      "project_path": "data/assets/stage_5_64.png",
+      "legacy_path": "/assets/stages/stage_5_64.png",
+      "legacy_project_path": "data/assets/stages/stage_5_64.png",
+      "size": {
+        "width": 64,
+        "height": 64
+      },
+      "rgb565_bytes": 8192,
+      "rgb565_path": null
+    },
+    {
+      "name": "icon_ph_32.png",
+      "group": "icons",
+      "path": "/assets/icon_ph_32.png",
+      "project_path": "data/assets/icon_ph_32.png",
+      "legacy_path": "/assets/icons/icon_ph_32.png",
+      "legacy_project_path": "data/assets/icons/icon_ph_32.png",
+      "size": {
+        "width": 32,
+        "height": 32
+      },
+      "rgb565_bytes": 2048,
+      "rgb565_path": null
+    },
+    {
+      "name": "icon_ec_32.png",
+      "group": "icons",
+      "path": "/assets/icon_ec_32.png",
+      "project_path": "data/assets/icon_ec_32.png",
+      "legacy_path": "/assets/icons/icon_ec_32.png",
+      "legacy_project_path": "data/assets/icons/icon_ec_32.png",
+      "size": {
+        "width": 32,
+        "height": 32
+      },
+      "rgb565_bytes": 2048,
+      "rgb565_path": null
+    },
+    {
+      "name": "icon_temp_water_32.png",
+      "group": "icons",
+      "path": "/assets/icon_temp_water_32.png",
+      "project_path": "data/assets/icon_temp_water_32.png",
+      "legacy_path": "/assets/icons/icon_temp_water_32.png",
+      "legacy_project_path": "data/assets/icons/icon_temp_water_32.png",
+      "size": {
+        "width": 32,
+        "height": 32
+      },
+      "rgb565_bytes": 2048,
+      "rgb565_path": null
+    },
+    {
+      "name": "icon_temp_air_32.png",
+      "group": "icons",
+      "path": "/assets/icon_temp_air_32.png",
+      "project_path": "data/assets/icon_temp_air_32.png",
+      "legacy_path": "/assets/icons/icon_temp_air_32.png",
+      "legacy_project_path": "data/assets/icons/icon_temp_air_32.png",
+      "size": {
+        "width": 32,
+        "height": 32
+      },
+      "rgb565_bytes": 2048,
+      "rgb565_path": null
+    },
+    {
+      "name": "icon_humidity_32.png",
+      "group": "icons",
+      "path": "/assets/icon_humidity_32.png",
+      "project_path": "data/assets/icon_humidity_32.png",
+      "legacy_path": "/assets/icons/icon_humidity_32.png",
+      "legacy_project_path": "data/assets/icons/icon_humidity_32.png",
+      "size": {
+        "width": 32,
+        "height": 32
+      },
+      "rgb565_bytes": 2048,
+      "rgb565_path": null
+    },
+    {
+      "name": "icon_level_32.png",
+      "group": "icons",
+      "path": "/assets/icon_level_32.png",
+      "project_path": "data/assets/icon_level_32.png",
+      "legacy_path": "/assets/icons/icon_level_32.png",
+      "legacy_project_path": "data/assets/icons/icon_level_32.png",
+      "size": {
+        "width": 32,
+        "height": 32
+      },
+      "rgb565_bytes": 2048,
+      "rgb565_path": null
+    },
+    {
+      "name": "icon_pump_32.png",
+      "group": "icons",
+      "path": "/assets/icon_pump_32.png",
+      "project_path": "data/assets/icon_pump_32.png",
+      "legacy_path": "/assets/icons/icon_pump_32.png",
+      "legacy_project_path": "data/assets/icons/icon_pump_32.png",
+      "size": {
+        "width": 32,
+        "height": 32
+      },
+      "rgb565_bytes": 2048,
+      "rgb565_path": null
+    },
+    {
+      "name": "icon_recirculation_32.png",
+      "group": "icons",
+      "path": "/assets/icon_recirculation_32.png",
+      "project_path": "data/assets/icon_recirculation_32.png",
+      "legacy_path": "/assets/icons/icon_recirculation_32.png",
+      "legacy_project_path": "data/assets/icons/icon_recirculation_32.png",
+      "size": {
+        "width": 32,
+        "height": 32
+      },
+      "rgb565_bytes": 2048,
+      "rgb565_path": null
+    },
+    {
+      "name": "icon_fill_32.png",
+      "group": "icons",
+      "path": "/assets/icon_fill_32.png",
+      "project_path": "data/assets/icon_fill_32.png",
+      "legacy_path": "/assets/icons/icon_fill_32.png",
+      "legacy_project_path": "data/assets/icons/icon_fill_32.png",
+      "size": {
+        "width": 32,
+        "height": 32
+      },
+      "rgb565_bytes": 2048,
+      "rgb565_path": null
+    },
+    {
+      "name": "icon_light_32.png",
+      "group": "icons",
+      "path": "/assets/icon_light_32.png",
+      "project_path": "data/assets/icon_light_32.png",
+      "legacy_path": "/assets/icons/icon_light_32.png",
+      "legacy_project_path": "data/assets/icons/icon_light_32.png",
+      "size": {
+        "width": 32,
+        "height": 32
+      },
+      "rgb565_bytes": 2048,
+      "rgb565_path": null
+    },
+    {
+      "name": "icon_fan_in_32.png",
+      "group": "icons",
+      "path": "/assets/icon_fan_in_32.png",
+      "project_path": "data/assets/icon_fan_in_32.png",
+      "legacy_path": "/assets/icons/icon_fan_in_32.png",
+      "legacy_project_path": "data/assets/icons/icon_fan_in_32.png",
+      "size": {
+        "width": 32,
+        "height": 32
+      },
+      "rgb565_bytes": 2048,
+      "rgb565_path": null
+    },
+    {
+      "name": "icon_fan_out_32.png",
+      "group": "icons",
+      "path": "/assets/icon_fan_out_32.png",
+      "project_path": "data/assets/icon_fan_out_32.png",
+      "legacy_path": "/assets/icons/icon_fan_out_32.png",
+      "legacy_project_path": "data/assets/icons/icon_fan_out_32.png",
+      "size": {
+        "width": 32,
+        "height": 32
+      },
+      "rgb565_bytes": 2048,
+      "rgb565_path": null
+    },
+    {
+      "name": "status_on_32.png",
+      "group": "status",
+      "path": "/assets/status_on_32.png",
+      "project_path": "data/assets/status_on_32.png",
+      "legacy_path": "/assets/status/status_on_32.png",
+      "legacy_project_path": "data/assets/status/status_on_32.png",
+      "size": {
+        "width": 32,
+        "height": 32
+      },
+      "rgb565_bytes": 2048,
+      "rgb565_path": null
+    },
+    {
+      "name": "status_off_32.png",
+      "group": "status",
+      "path": "/assets/status_off_32.png",
+      "project_path": "data/assets/status_off_32.png",
+      "legacy_path": "/assets/status/status_off_32.png",
+      "legacy_project_path": "data/assets/status/status_off_32.png",
+      "size": {
+        "width": 32,
+        "height": 32
+      },
+      "rgb565_bytes": 2048,
+      "rgb565_path": null
+    },
+    {
+      "name": "status_alert_32.png",
+      "group": "status",
+      "path": "/assets/status_alert_32.png",
+      "project_path": "data/assets/status_alert_32.png",
+      "legacy_path": "/assets/status/status_alert_32.png",
+      "legacy_project_path": "data/assets/status/status_alert_32.png",
+      "size": {
+        "width": 32,
+        "height": 32
+      },
+      "rgb565_bytes": 2048,
+      "rgb565_path": null
+    },
+    {
+      "name": "nav_back_32.png",
+      "group": "navigation",
+      "path": "/assets/nav_back_32.png",
+      "project_path": "data/assets/nav_back_32.png",
+      "legacy_path": "/assets/navigation/nav_back_32.png",
+      "legacy_project_path": "data/assets/navigation/nav_back_32.png",
+      "size": {
+        "width": 32,
+        "height": 32
+      },
+      "rgb565_bytes": 2048,
+      "rgb565_path": null
+    },
+    {
+      "name": "nav_home_32.png",
+      "group": "navigation",
+      "path": "/assets/nav_home_32.png",
+      "project_path": "data/assets/nav_home_32.png",
+      "legacy_path": "/assets/navigation/nav_home_32.png",
+      "legacy_project_path": "data/assets/navigation/nav_home_32.png",
+      "size": {
+        "width": 32,
+        "height": 32
+      },
+      "rgb565_bytes": 2048,
+      "rgb565_path": null
+    },
+    {
+      "name": "nav_next_32.png",
+      "group": "navigation",
+      "path": "/assets/nav_next_32.png",
+      "project_path": "data/assets/nav_next_32.png",
+      "legacy_path": "/assets/navigation/nav_next_32.png",
+      "legacy_project_path": "data/assets/navigation/nav_next_32.png",
+      "size": {
+        "width": 32,
+        "height": 32
+      },
+      "rgb565_bytes": 2048,
+      "rgb565_path": null
+    }
+  ]
+}

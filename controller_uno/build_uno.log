@@ -1,0 +1,72 @@
+Processing uno_r4_minima (platform: renesas-ra; board: uno_r4_minima; framework: arduino)
+--------------------------------------------------------------------------------
+Verbose mode can be enabled via `-v, --verbose` option
+CONFIGURATION: https://docs.platformio.org/page/boards/renesas-ra/uno_r4_minima.html
+PLATFORM: Renesas RA (1.8.0) > Arduino Uno R4 Minima
+HARDWARE: RA4M1 48MHz, 32KB RAM, 256KB Flash
+DEBUG: Current (cmsis-dap) External (cmsis-dap, jlink)
+PACKAGES: 
+ - framework-arduinorenesas-uno @ 1.5.1 
+ - tool-dfuutil-arduino @ 1.11.0 
+ - toolchain-gccarmnoneeabi @ 1.70201.0 (7.2.1)
+LDF: Library Dependency Finder -> https://bit.ly/configure-pio-ldf
+LDF Modes: Finder ~ chain, Compatibility ~ soft
+Found 22 compatible libraries
+Scanning dependencies...
+Dependency Graph
+|-- Wire
+Building in release mode
+Compiling .pio\build\uno_r4_minima\src\main.cpp.o
+Compiling .pio\build\uno_r4_minima\libaa5\Wire\Wire.cpp.o
+Archiving .pio\build\uno_r4_minima\libaa5\libWire.a
+Compiling .pio\build\uno_r4_minima\FrameworkArduinoVariant\tmp_gen_c_files\common_data.c.o
+Compiling .pio\build\uno_r4_minima\FrameworkArduinoVariant\tmp_gen_c_files\main.c.o
+Compiling .pio\build\uno_r4_minima\FrameworkArduinoVariant\tmp_gen_c_files\pin_data.c.o
+Compiling .pio\build\uno_r4_minima\FrameworkArduinoVariant\variant.cpp.o
+Archiving .pio\build\uno_r4_minima\libFrameworkArduinoVariant.a
+Compiling .pio\build\uno_r4_minima\FrameworkArduino\FspTimer.cpp.o
+Compiling .pio\build\uno_r4_minima\FrameworkArduino\IRQManager.cpp.o
+Compiling .pio\build\uno_r4_minima\FrameworkArduino\Interrupts.cpp.o
+Compiling .pio\build\uno_r4_minima\FrameworkArduino\Serial.cpp.o
+Compiling .pio\build\uno_r4_minima\FrameworkArduino\SerialObj1.cpp.o
+Compiling .pio\build\uno_r4_minima\FrameworkArduino\SerialObj2.cpp.o
+Compiling .pio\build\uno_r4_minima\FrameworkArduino\SerialObj3.cpp.o
+Compiling .pio\build\uno_r4_minima\FrameworkArduino\Tone.cpp.o
+Compiling .pio\build\uno_r4_minima\FrameworkArduino\WMath.cpp.o
+Compiling .pio\build\uno_r4_minima\FrameworkArduino\analog.cpp.o
+Compiling .pio\build\uno_r4_minima\FrameworkArduino\api\CanMsg.cpp.o
+Compiling .pio\build\uno_r4_minima\FrameworkArduino\api\CanMsgRingbuffer.cpp.o
+Compiling .pio\build\uno_r4_minima\FrameworkArduino\api\Common.cpp.o
+Compiling .pio\build\uno_r4_minima\FrameworkArduino\api\IPAddress.cpp.o
+Compiling .pio\build\uno_r4_minima\FrameworkArduino\api\PluggableUSB.cpp.o
+Compiling .pio\build\uno_r4_minima\FrameworkArduino\api\Print.cpp.o
+Compiling .pio\build\uno_r4_minima\FrameworkArduino\api\Stream.cpp.o
+Compiling .pio\build\uno_r4_minima\FrameworkArduino\api\String.cpp.o
+Compiling .pio\build\uno_r4_minima\FrameworkArduino\boot.cpp.o
+Compiling .pio\build\uno_r4_minima\FrameworkArduino\cm_backtrace\cm_backtrace.c.o
+Compiling .pio\build\uno_r4_minima\FrameworkArduino\cm_backtrace\fault_handler\gcc\cmb_fault.S.o
+Compiling .pio\build\uno_r4_minima\FrameworkArduino\cortex_handlers.c.o
+Compiling .pio\build\uno_r4_minima\FrameworkArduino\dac.cpp.o
+Compiling .pio\build\uno_r4_minima\FrameworkArduino\digital.cpp.o
+Compiling .pio\build\uno_r4_minima\FrameworkArduino\itoa.c.o
+Compiling .pio\build\uno_r4_minima\FrameworkArduino\main.cpp.o
+Compiling .pio\build\uno_r4_minima\FrameworkArduino\pinDefinitions.cpp.o
+Compiling .pio\build\uno_r4_minima\FrameworkArduino\pulse.cpp.o
+Compiling .pio\build\uno_r4_minima\FrameworkArduino\pwm.cpp.o
+Compiling .pio\build\uno_r4_minima\FrameworkArduino\shift.cpp.o
+Compiling .pio\build\uno_r4_minima\FrameworkArduino\time.cpp.o
+Compiling .pio\build\uno_r4_minima\FrameworkArduino\tinyusb\class\audio\audio_device.c.o
+Compiling .pio\build\uno_r4_minima\FrameworkArduino\tinyusb\class\bth\bth_device.c.o
+Compiling .pio\build\uno_r4_minima\FrameworkArduino\tinyusb\class\cdc\cdc_device.c.o
+Compiling .pio\build\uno_r4_minima\FrameworkArduino\tinyusb\class\cdc\cdc_host.c.o
+Compiling .pio\build\uno_r4_minima\FrameworkArduino\tinyusb\class\cdc\cdc_rndis_host.c.o
+Compiling .pio\build\uno_r4_minima\FrameworkArduino\tinyusb\class\dfu\dfu_device.c.o
+Compiling .pio\build\uno_r4_minima\FrameworkArduino\tinyusb\class\dfu\dfu_rt_device.c.o
+Compiling .pio\build\uno_r4_minima\FrameworkArduino\tinyusb\class\hid\hid_device.c.o
+Compiling .pio\build\uno_r4_minima\FrameworkArduino\tinyusb\class\hid\hid_host.c.o
+Compiling .pio\build\uno_r4_minima\FrameworkArduino\tinyusb\class\midi\midi_device.c.o
+Compiling .pio\build\uno_r4_minima\FrameworkArduino\tinyusb\class\msc\msc_device.c.o
+Compiling .pio\build\uno_r4_minima\FrameworkArduino\tinyusb\class\msc\msc_host.c.o
+Compiling .pio\build\uno_r4_minima\FrameworkArduino\tinyusb\class\net\ecm_rndis_device.c.o
+Compiling .pio\build\uno_r4_minima\FrameworkArduino\tinyusb\class\net\ncm_device.c.o
+Compiling .pio\build\uno_r4_minima\FrameworkArduino\tinyusb\class\usbtmc\usbtmc_device.c.o

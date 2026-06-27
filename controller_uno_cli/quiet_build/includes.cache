@@ -1,0 +1,17 @@
+[
+  {
+    "Sourcefile": null,
+    "Include": "",
+    "Includepath": "C:\\Users\\ivanm\\AppData\\Local\\Arduino15\\packages\\arduino\\hardware\\renesas_uno\\1.4.1\\cores\\arduino"
+  },
+  {
+    "Sourcefile": null,
+    "Include": "",
+    "Includepath": "C:\\Users\\ivanm\\AppData\\Local\\Arduino15\\packages\\arduino\\hardware\\renesas_uno\\1.4.1\\variants\\MINIMA"
+  },
+  {
+    "Sourcefile": "C:\\e-Weed\\controller_uno_cli\\quiet_build\\sketch\\quiet_uart.ino.cpp",
+    "Include": "",
+    "Includepath": null
+  }
+]

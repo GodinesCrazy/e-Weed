@@ -1,0 +1,16 @@
+C:\e-Weed\controller_uno_cli\quiet_build\core\tinyusb\common\tusb_fifo.c.o: \
+ C:\Users\ivanm\AppData\Local\Arduino15\packages\arduino\hardware\renesas_uno\1.4.1\cores\arduino\tinyusb\common\tusb_fifo.c \
+ C:\Users\ivanm\AppData\Local\Arduino15\packages\arduino\hardware\renesas_uno\1.4.1\cores\arduino/tinyusb/osal/osal.h \
+ C:\Users\ivanm\AppData\Local\Arduino15\packages\arduino\hardware\renesas_uno\1.4.1\cores\arduino/tinyusb/common/tusb_common.h \
+ C:\Users\ivanm\AppData\Local\Arduino15\packages\arduino\hardware\renesas_uno\1.4.1\cores\arduino/tinyusb/tusb_option.h \
+ C:\Users\ivanm\AppData\Local\Arduino15\packages\arduino\hardware\renesas_uno\1.4.1\cores\arduino/tinyusb/common/tusb_compiler.h \
+ C:\Users\ivanm\AppData\Local\Arduino15\packages\arduino\hardware\renesas_uno\1.4.1\variants\MINIMA/tusb_config.h \
+ C:\Users\ivanm\AppData\Local\Arduino15\packages\arduino\hardware\renesas_uno\1.4.1\cores\arduino/tinyusb/common/tusb_mcu.h \
+ C:\Users\ivanm\AppData\Local\Arduino15\packages\arduino\hardware\renesas_uno\1.4.1\cores\arduino/tinyusb/common/tusb_compiler.h \
+ C:\Users\ivanm\AppData\Local\Arduino15\packages\arduino\hardware\renesas_uno\1.4.1\cores\arduino/tinyusb/common/tusb_verify.h \
+ C:\Users\ivanm\AppData\Local\Arduino15\packages\arduino\hardware\renesas_uno\1.4.1\cores\arduino/tinyusb/common/tusb_types.h \
+ C:\Users\ivanm\AppData\Local\Arduino15\packages\arduino\hardware\renesas_uno\1.4.1\cores\arduino/tinyusb/common/tusb_debug.h \
+ C:\Users\ivanm\AppData\Local\Arduino15\packages\arduino\hardware\renesas_uno\1.4.1\cores\arduino/tinyusb/common/tusb_timeout.h \
+ C:\Users\ivanm\AppData\Local\Arduino15\packages\arduino\hardware\renesas_uno\1.4.1\cores\arduino/tinyusb/osal/osal_none.h \
+ C:\Users\ivanm\AppData\Local\Arduino15\packages\arduino\hardware\renesas_uno\1.4.1\cores\arduino/tinyusb/common/tusb_fifo.h \
+ C:\Users\ivanm\AppData\Local\Arduino15\packages\arduino\hardware\renesas_uno\1.4.1\cores\arduino\tinyusb\common\tusb_fifo.h

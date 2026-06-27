@@ -1,0 +1,52 @@
+[
+  {
+    "Sourcefile": null,
+    "Include": "",
+    "Includepath": "C:\\Users\\ivanm\\AppData\\Local\\Arduino15\\packages\\arduino\\hardware\\renesas_uno\\1.4.1\\cores\\arduino"
+  },
+  {
+    "Sourcefile": null,
+    "Include": "",
+    "Includepath": "C:\\Users\\ivanm\\AppData\\Local\\Arduino15\\packages\\arduino\\hardware\\renesas_uno\\1.4.1\\variants\\MINIMA"
+  },
+  {
+    "Sourcefile": "C:\\e-Weed\\controller_uno_cli\\build\\sketch\\eweed_uno.ino.cpp",
+    "Include": "DHT.h",
+    "Includepath": "C:\\Users\\ivanm\\OneDrive\\Documentos\\Arduino\\libraries\\DHT_sensor_library"
+  },
+  {
+    "Sourcefile": "C:\\e-Weed\\controller_uno_cli\\build\\sketch\\eweed_uno.ino.cpp",
+    "Include": "Wire.h",
+    "Includepath": "C:\\Users\\ivanm\\AppData\\Local\\Arduino15\\packages\\arduino\\hardware\\renesas_uno\\1.4.1\\libraries\\Wire"
+  },
+  {
+    "Sourcefile": "C:\\e-Weed\\controller_uno_cli\\build\\sketch\\eweed_uno.ino.cpp",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "C:\\Users\\ivanm\\OneDrive\\Documentos\\Arduino\\libraries\\DHT_sensor_library\\DHT.cpp",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "C:\\Users\\ivanm\\OneDrive\\Documentos\\Arduino\\libraries\\DHT_sensor_library\\DHT_U.cpp",
+    "Include": "Adafruit_Sensor.h",
+    "Includepath": "C:\\Users\\ivanm\\OneDrive\\Documentos\\Arduino\\libraries\\Adafruit_Unified_Sensor"
+  },
+  {
+    "Sourcefile": "C:\\Users\\ivanm\\OneDrive\\Documentos\\Arduino\\libraries\\DHT_sensor_library\\DHT_U.cpp",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "C:\\Users\\ivanm\\AppData\\Local\\Arduino15\\packages\\arduino\\hardware\\renesas_uno\\1.4.1\\libraries\\Wire\\Wire.cpp",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "C:\\Users\\ivanm\\OneDrive\\Documentos\\Arduino\\libraries\\Adafruit_Unified_Sensor\\Adafruit_Sensor.cpp",
+    "Include": "",
+    "Includepath": null
+  }
+]
