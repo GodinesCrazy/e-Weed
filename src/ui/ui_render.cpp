@@ -10,6 +10,69 @@
 #include <cstdio>
 #include <cstring>
 
+static void ui_ascii_text(const char *in, char *out, size_t outSize) {
+    if (!out || outSize == 0) return;
+    if (!in) {
+        out[0] = '\0';
+        return;
+    }
+
+    size_t j = 0;
+    for (size_t i = 0; in[i] != '\0' && j + 1 < outSize;) {
+        const unsigned char c = static_cast<unsigned char>(in[i]);
+
+        if (c < 128) {
+            out[j++] = static_cast<char>(c);
+            ++i;
+            continue;
+        }
+
+        const unsigned char c2 = static_cast<unsigned char>(in[i + 1]);
+        const unsigned char c3 = static_cast<unsigned char>(in[i + 2]);
+
+        if (c == 0xC3) {
+            char repl = 0;
+            switch (c2) {
+                case 0x81: case 0xA1: repl = 'a'; break; // A/a con acento
+                case 0x89: case 0xA9: repl = 'e'; break; // E/e con acento
+                case 0x8D: case 0xAD: repl = 'i'; break; // I/i con acento
+                case 0x93: case 0xB3: repl = 'o'; break; // O/o con acento
+                case 0x9A: case 0xBA: repl = 'u'; break; // U/u con acento
+                case 0x9C: case 0xBC: repl = 'u'; break; // U/u dieresis
+                case 0x91: case 0xB1: repl = 'n'; break; // N/n
+                default: break;
+            }
+            if (repl != 0) {
+                out[j++] = repl;
+                i += 2;
+                continue;
+            }
+        }
+
+        if (c == 0xC2 && (c2 == 0xA1 || c2 == 0xBF)) {
+            i += 2;
+            continue;
+        }
+
+        if (c == 0xE2 && c2 == 0x80 && (c3 == 0x93 || c3 == 0x94)) {
+            out[j++] = '-';
+            i += 3;
+            continue;
+        }
+
+        i += (c >= 0xE0) ? 3 : 2;
+    }
+    out[j] = '\0';
+}
+
+static void ui_label_set_text_ascii(lv_obj_t *label, const char *text) {
+    char clean[256];
+    ui_ascii_text(text, clean, sizeof(clean));
+    lv_label_set_text(label, clean);
+}
+
+#define lv_label_set_text(label, text) ui_label_set_text_ascii(label, text)
+
 static lv_obj_t *g_scr[SCR_COUNT] = {};
 static uint32_t  g_activity_ms    = 0;
 
@@ -322,7 +385,7 @@ void build_splash() {
     lv_obj_set_style_text_align(title, LV_TEXT_ALIGN_CENTER, 0);
     lv_obj_set_style_text_color(title, C_ACC, 0);
 
-    lv_obj_t *sub = mk_label(s, "HMI hidropónica profesional", 0, 86, F_M);
+    lv_obj_t *sub = mk_label(s, "HMI hidroponica profesional", 0, 86, F_M);
     lv_obj_set_width(sub, 320);
     lv_obj_set_style_text_align(sub, LV_TEXT_ALIGN_CENTER, 0);
 
@@ -345,8 +408,8 @@ void build_home() {
     tile(s, 8, 36, "Dashboard", SCR_DASHBOARD, true);
     tile(s, 162, 36, "Sensores", SCR_SENSORS);
     tile(s, 8, 80, "Actuadores", SCR_ACTUATORS);
-    tile(s, 162, 80, "Automatización", SCR_AUTOMATION);
-    tile(s, 8, 124, "Calibración", SCR_CALIBRATION, true);
+    tile(s, 162, 80, "Automatizacion", SCR_AUTOMATION);
+    tile(s, 8, 124, "Calibracion", SCR_CALIBRATION, true);
     tile(s, 162, 124, "Alarmas", SCR_ALARMS);
     tile(s, 8, 168, "Ajustes", SCR_SETTINGS_HUB);
     tile(s, 162, 168, "Mantenimiento", SCR_MAINTENANCE);
@@ -384,7 +447,7 @@ void build_dashboard() {
 
     wd.level = mk_label(s, "Nivel: --", 8, 158, F_S);
     wd.alarm = mk_label(s, "Alarmas: --", 8, 176, F_S);
-    wd.action = mk_label(s, "Última acción: --", 8, 198, F_S);
+    wd.action = mk_label(s, "Ultima accion: --", 8, 198, F_S);
     lv_label_set_long_mode(wd.action, LV_LABEL_LONG_DOT);
     lv_obj_set_width(wd.action, 304);
     g_scr[SCR_DASHBOARD] = s;
@@ -470,7 +533,7 @@ void build_actuators() {
 
 void build_automation() {
     lv_obj_t *s = mk_screen();
-    hdr(s, "Automatización", SCR_HOME);
+    hdr(s, "Automatizacion", SCR_HOME);
 
     lv_obj_t *b0 = mk_btn(s, 8, 34, 96, 28, false);
     lv_label_set_text(lv_label_create(b0), "Manual");
@@ -490,7 +553,7 @@ void build_automation() {
     wa.mode = mk_label(s, "Modo: --", 8, 72, F_S);
     wa.state = mk_label(s, "Controlador: --", 8, 92, F_S);
     wa.action = mk_label(s, "Paso: --", 8, 112, F_S);
-    wa.telemetry = mk_label(s, "Telemetría: --", 8, 132, F_S);
+    wa.telemetry = mk_label(s, "Telemetria: --", 8, 132, F_S);
     wa.lock = mk_label(s, "Interlocks: --", 8, 154, F_S);
     lv_label_set_long_mode(wa.lock, LV_LABEL_LONG_WRAP);
     lv_obj_set_width(wa.lock, 304);
@@ -499,7 +562,7 @@ void build_automation() {
 
 void build_calibration() {
     lv_obj_t *s = mk_screen();
-    hdr(s, "Calibración guiada", SCR_HOME);
+    hdr(s, "Calibracion guiada", SCR_HOME);
 
     lv_obj_t *tv = lv_tabview_create(s, LV_DIR_TOP, 24);
     lv_obj_set_pos(tv, 0, 28);
@@ -539,7 +602,7 @@ void build_calibration() {
     lv_obj_set_size(g_sl_cslope, 222, 10);
 
     lv_obj_t *bphSave = mk_btn(t1, 8, 176, 284, 28, true);
-    lv_label_set_text(lv_label_create(bphSave), "Guardar calibración pH");
+    lv_label_set_text(lv_label_create(bphSave), "Guardar calibracion pH");
     lv_obj_center(lv_obj_get_child(bphSave, 0));
     lv_obj_add_event_cb(bphSave, [](lv_event_t *) {
         SystemSettings ss = readSettings();
@@ -554,7 +617,7 @@ void build_calibration() {
     }, LV_EVENT_CLICKED, nullptr);
 
     lv_obj_t *tdsInfo = mk_label(t2,
-        "Calibración TDS/EC\nUse solución patrón. Ajuste el factor solo si la lectura estable difiere del patrón.",
+        "Calibracion TDS/EC\nUse solucion patron. Ajuste el factor solo si la lectura estable difiere del patron.",
         8, 8, F_S);
     lv_label_set_long_mode(tdsInfo, LV_LABEL_LONG_WRAP);
     lv_obj_set_width(tdsInfo, 286);
@@ -591,13 +654,13 @@ void build_calibration() {
     lv_obj_set_style_text_color(wcal.status, C_ACC, 0);
 
     wcal.resetMsg = mk_label(t4,
-        "Reset seguro:\nPrimer toque arma la restauración.\nSegundo toque confirma.",
+        "Reset seguro:\nPrimer toque arma la restauracion.\nSegundo toque confirma.",
         8, 8, F_S);
     lv_label_set_long_mode(wcal.resetMsg, LV_LABEL_LONG_WRAP);
     lv_obj_set_width(wcal.resetMsg, 286);
 
     lv_obj_t *br = mk_btn(t4, 8, 100, 284, 34, true);
-    lv_label_set_text(lv_label_create(br), "Restaurar fábrica");
+    lv_label_set_text(lv_label_create(br), "Restaurar fabrica");
     lv_obj_center(lv_obj_get_child(br, 0));
     lv_obj_add_event_cb(br, [](lv_event_t *) {
         if (!s_reset_armed) {
@@ -614,7 +677,7 @@ void build_calibration() {
         saveSettings(ss);
         send_cmd("CMD:CAL_PH_SAVE:21.340:-5.700");
         send_cmd("CMD:CAL_TDS_SAVE:1.0000");
-        if (wcal.resetMsg) lv_label_set_text(wcal.resetMsg, "Calibración restaurada y enviada a UNO R4.");
+        if (wcal.resetMsg) lv_label_set_text(wcal.resetMsg, "Calibracion restaurada y enviada a UNO R4.");
     }, LV_EVENT_CLICKED, nullptr);
 
     g_scr[SCR_CALIBRATION] = s;
@@ -647,13 +710,13 @@ void build_settings_hub() {
     hdr(s, "Ajustes", SCR_HOME);
     int y = 34;
     hub_item(s, y, "Objetivos por etapa", SCR_SET_STAGE); y += 25;
-    hub_item(s, y, "Límites de seguridad", SCR_SET_SAFETY); y += 25;
-    hub_item(s, y, "Recirculación", SCR_SET_RECIRC); y += 25;
-    hub_item(s, y, "Estabilización", SCR_SET_STAB); y += 25;
+    hub_item(s, y, "Limites de seguridad", SCR_SET_SAFETY); y += 25;
+    hub_item(s, y, "Recirculacion", SCR_SET_RECIRC); y += 25;
+    hub_item(s, y, "Estabilizacion", SCR_SET_STAB); y += 25;
     hub_item(s, y, "Microdosis", SCR_SET_MICRO); y += 25;
     hub_item(s, y, "Fotoperiodo", SCR_SET_PHOTO); y += 25;
-    hub_item(s, y, "Ventilación", SCR_SET_VENT); y += 25;
-    hub_item(s, y, "Comunicación / WiFi", SCR_SET_COMM); y += 25;
+    hub_item(s, y, "Ventilacion", SCR_SET_VENT); y += 25;
+    hub_item(s, y, "Comunicacion / WiFi", SCR_SET_COMM); y += 25;
     hub_item(s, y, "Pantalla y sonido", SCR_SET_DISPLAY);
     g_scr[SCR_SETTINGS_HUB] = s;
 }
@@ -680,7 +743,7 @@ void build_set_stage() {
 
 void build_set_comm() {
     lv_obj_t *s = mk_screen();
-    hdr(s, "Comunicación", SCR_SETTINGS_HUB);
+    hdr(s, "Comunicacion", SCR_SETTINGS_HUB);
     lv_obj_t *l = mk_label(s, "UART2 hacia UNO R4: 115200 baudios. WiFi AP/STA local para API.", 8, 36, F_S);
     lv_label_set_long_mode(l, LV_LABEL_LONG_WRAP);
     lv_obj_set_width(l, 304);
@@ -742,7 +805,7 @@ void build_set_sound() {
 void build_maintenance() {
     lv_obj_t *s = mk_screen();
     hdr(s, "Mantenimiento", SCR_HOME);
-    wm.msg = mk_label(s, "Pruebas rápidas del sistema.", 8, 196, F_S);
+    wm.msg = mk_label(s, "Pruebas rapidas del sistema.", 8, 196, F_S);
 
     lv_obj_t *b1 = mk_btn(s, 8, 38, 304, 28, false);
     lv_label_set_text(lv_label_create(b1), "Solicitar estado UNO R4");
@@ -792,12 +855,12 @@ void do_build(ScreenId id) {
         case SCR_ALARMS: build_alarms(); break;
         case SCR_SETTINGS_HUB: build_settings_hub(); break;
         case SCR_SET_STAGE: build_set_stage(); break;
-        case SCR_SET_SAFETY: build_simple_settings("Seguridad", "Límites locales de visualización y alarma. El control físico se ejecuta en UNO R4.", id); break;
-        case SCR_SET_RECIRC: build_simple_settings("Recirculación", "Ajustes de ciclos de recirculación. Mantener cambios coordinados con UNO R4.", id); break;
-        case SCR_SET_STAB: build_simple_settings("Estabilización", "Tiempo de espera entre dosis y nueva medición para evitar sobredosificación.", id); break;
-        case SCR_SET_MICRO: build_simple_settings("Microdosis", "Volumen base de dosificación. Ajustar con pruebas reales de bomba peristáltica.", id); break;
+        case SCR_SET_SAFETY: build_simple_settings("Seguridad", "Limites locales de visualizacion y alarma. El control fisico se ejecuta en UNO R4.", id); break;
+        case SCR_SET_RECIRC: build_simple_settings("Recirculacion", "Ajustes de ciclos de recirculacion. Mantener cambios coordinados con UNO R4.", id); break;
+        case SCR_SET_STAB: build_simple_settings("Estabilizacion", "Tiempo de espera entre dosis y nueva medicion para evitar sobredosificacion.", id); break;
+        case SCR_SET_MICRO: build_simple_settings("Microdosis", "Volumen base de dosificacion. Ajustar con pruebas reales de bomba peristaltica.", id); break;
         case SCR_SET_PHOTO: build_simple_settings("Fotoperiodo", "Horario de luz. Las cargas 220V deben estar aisladas y protegidas.", id); break;
-        case SCR_SET_VENT: build_simple_settings("Ventilación", "Umbrales de ventilación por temperatura/humedad. Control físico en UNO R4.", id); break;
+        case SCR_SET_VENT: build_simple_settings("Ventilacion", "Umbrales de ventilacion por temperatura/humedad. Control fisico en UNO R4.", id); break;
         case SCR_SET_COMM: build_set_comm(); break;
         case SCR_SET_DISPLAY: build_set_display(); break;
         case SCR_SET_SOUND: build_set_sound(); break;
@@ -856,26 +919,26 @@ void tick_dashboard(const SystemState &st, uint32_t now) {
     lblf(wd.level, "Nivel: %s  min=%s max=%s", st.level_min ? "BAJO" : (st.level_max ? "ALTO" : "OK"), st.level_min ? "ON" : "ok", st.level_max ? "ON" : "ok");
     lblf(wd.alarm, st.current_alarm ? "Alarma: %s" : "Alarmas: sin alarmas", st.alarm_message);
     lv_obj_set_style_text_color(wd.alarm, st.current_alarm ? C_ERR : C_OK, 0);
-    lblf(wd.action, "Última acción: %s", st.last_action);
+    lblf(wd.action, "Ultima accion: %s", st.last_action);
 }
 
 void tick_sensors(const SystemState &st, uint32_t now) {
     if (!ws.ln[0]) return;
-    lblf(ws.ln[0], "pH: %s %.2f", st.ph_probe_ok ? "OK" : "inválido", st.ph);
-    lblf(ws.ln[1], "TDS/EC: %s %d ppm | %.2f mS", st.tds_probe_ok ? "OK" : "inválido", st.tds, st.tds / 500.0f);
-    lblf(ws.ln[2], "T agua: %.1f C | sonda %s", st.temp_water, st.tw_probe_ok ? "OK" : "inválida");
+    lblf(ws.ln[0], "pH: %s %.2f", st.ph_probe_ok ? "OK" : "invalido", st.ph);
+    lblf(ws.ln[1], "TDS/EC: %s %d ppm | %.2f mS", st.tds_probe_ok ? "OK" : "invalido", st.tds, st.tds / 500.0f);
+    lblf(ws.ln[2], "T agua: %.1f C | sonda %s", st.temp_water, st.tw_probe_ok ? "OK" : "invalida");
     lblf(ws.ln[3], "T aire: %.1f C | DHT %s", st.temp_air, st.dht_online ? "OK" : "OFF");
     lblf(ws.ln[4], "Humedad: %.0f %%", st.hum_air);
     lblf(ws.ln[5], "Nivel min:%s max:%s", st.level_min ? "ON" : "ok", st.level_max ? "ON" : "ok");
     lblf(ws.ln[6], "RTC UNO R4: %s | Hora: %s", st.rtc_online ? "OK" : "no OK", st.controller_clock[0] ? st.controller_clock : "--");
-    lblf(ws.ln[7], "Telemetría: %s | hace %lus", st.telemetry_live ? "viva" : "sin datos", (unsigned long)((now - st.uart_last_rx_ms) / 1000UL));
+    lblf(ws.ln[7], "Telemetria: %s | hace %lus", st.telemetry_live ? "viva" : "sin datos", (unsigned long)((now - st.uart_last_rx_ms) / 1000UL));
     lblf(ws.ln[8], "Paquetes UART OK:%lu ERR:%lu", (unsigned long)st.uart_ok_packets, (unsigned long)st.uart_bad_packets);
 }
 
 void tick_actuators(const SystemState &st) {
     if (!wact.wrn) return;
     bool disabled = st.auto_mode && !st.maintenance_mode;
-    lv_label_set_text(wact.wrn, disabled ? "AUTO activo: conmutación deshabilitada." : "MAN/MANT: conmutación habilitada.");
+    lv_label_set_text(wact.wrn, disabled ? "AUTO activo: conmutacion deshabilitada." : "MAN/MANT: conmutacion habilitada.");
     lv_obj_set_style_text_color(wact.wrn, disabled ? C_WRN : C_OK, 0);
     const bool vals[] = {st.state_pump_a, st.state_pump_b, st.state_ph_up, st.state_ph_down, st.state_recirculation, st.state_pump_in, st.state_light, st.state_intractor, st.state_extractor, st.state_buzzer};
     s_act_sync = true;
@@ -894,16 +957,16 @@ void tick_auto(const SystemState &st, uint32_t now) {
     lblf(wa.mode, "Modo: %s", modeText(st));
     lblf(wa.state, "Controlador UNO R4: %s", st.telemetry_live ? "conectado" : "sin enlace");
     lblf(wa.action, "Paso actual: %s", st.last_action);
-    lblf(wa.telemetry, "Telemetría hace %lus", (unsigned long)((now - st.uart_last_rx_ms) / 1000UL));
-    if (st.auto_mode && !st.maintenance_mode) lv_label_set_text(wa.lock, "AUTO: la HMI no fuerza salidas. Interlocks y relés quedan bajo UNO R4.");
-    else if (st.maintenance_mode) lv_label_set_text(wa.lock, "MANT: control manual permitido con supervisión.");
-    else lv_label_set_text(wa.lock, "MANUAL: automatización detenida.");
+    lblf(wa.telemetry, "Telemetria hace %lus", (unsigned long)((now - st.uart_last_rx_ms) / 1000UL));
+    if (st.auto_mode && !st.maintenance_mode) lv_label_set_text(wa.lock, "AUTO: la HMI no fuerza salidas. Interlocks y reles quedan bajo UNO R4.");
+    else if (st.maintenance_mode) lv_label_set_text(wa.lock, "MANT: control manual permitido con supervision.");
+    else lv_label_set_text(wa.lock, "MANUAL: automatizacion detenida.");
 }
 
 void tick_cal(const SystemSettings &ss, const SystemState &st) {
     if (!wcal.values) return;
     lblf(wcal.values,
-         "Lectura actual\npH %.2f | TDS %d ppm\n\nCalibración guardada\npH offset %.3f\npH pendiente %.3f\nTDS factor %.4f\nRefs pH %.2f / %.2f",
+         "Lectura actual\npH %.2f | TDS %d ppm\n\nCalibracion guardada\npH offset %.3f\npH pendiente %.3f\nTDS factor %.4f\nRefs pH %.2f / %.2f",
          st.ph, st.tds, ss.ph_offset, ss.ph_slope, ss.tds_cal_factor, ss.ph_cal_ref1, ss.ph_cal_ref2);
 }
 
