@@ -1,9 +1,9 @@
 /**
  * @file main.cpp
- * @brief e-Weed controlador principal — Arduino UNO R4 Minima.
+ * @brief e-Weed controlador principal - Arduino UNO R4 Minima.
  *
- * Orden de inicialización: relés apagados → EEPROM/calibración → sensores/RTC →
- * automatización (arranque en mantenimiento seguro) → UART USB + Serial1 (ESP32 HMI).
+ * Orden de inicio: reles apagados, EEPROM/calibracion, sensores/RTC,
+ * automatizacion en modo seguro, UART USB y Serial1 con ESP32 HMI.
  */
 
 #include <Arduino.h>
@@ -63,6 +63,7 @@ void loop() {
   UartProto_pollHmi();
 
   Sensors::poll(false);
+  Actuators::tick(Sensors::data());
   Automation::tick();
   UartProto_periodicStatusIfDue();
   heartbeatLog();
