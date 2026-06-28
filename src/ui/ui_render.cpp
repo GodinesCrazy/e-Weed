@@ -96,7 +96,19 @@ struct WDash {
 } wd;
 
 struct WSens {
-    lv_obj_t *ln[9];
+    lv_obj_t *phValue;
+    lv_obj_t *phState;
+    lv_obj_t *tdsValue;
+    lv_obj_t *tdsState;
+    lv_obj_t *waterValue;
+    lv_obj_t *waterState;
+    lv_obj_t *airValue;
+    lv_obj_t *airState;
+    lv_obj_t *levelValue;
+    lv_obj_t *levelState;
+    lv_obj_t *sysValue;
+    lv_obj_t *sysState;
+    lv_obj_t *msg;
 } ws;
 
 struct WAct {
@@ -136,7 +148,7 @@ static lv_obj_t *g_sl_cslope  = nullptr;
 static lv_obj_t *g_sl_tdsf    = nullptr;
 
 constexpr const char *kActKey[] = {"PA", "PB", "PHU", "PHD", "REC", "PIN", "LUZ", "INT", "EXT", "BUZ"};
-constexpr const char *kActNm[]  = {"Nutr. A", "Nutr. B", "pH+", "pH-", "Recirc.", "Agua IN", "Luz", "Int.", "Ext.", "Buzzer"};
+constexpr const char *kActNm[]  = {"Nutr. A", "Nutr. B", "pH+", "pH-", "Recirc.", "Agua+", "Luz", "Int.", "Ext.", "Buzzer"};
 bool s_act_sync = false;
 
 SystemState readState() {
@@ -478,14 +490,60 @@ void build_stages() {
     g_scr[SCR_STAGES] = s;
 }
 
+lv_obj_t *sensor_card(lv_obj_t *s, lv_coord_t x, lv_coord_t y, const char *title, lv_obj_t **value, lv_obj_t **state) {
+    lv_obj_t *c = mk_card(s, x, y, 150, 46);
+
+    lv_obj_t *h = mk_label(c, title, 2, 0, F_S);
+    lv_obj_set_style_text_color(h, C_MUT, 0);
+
+    *state = mk_label(c, "--", 108, 0, F_S);
+    lv_obj_set_width(*state, 36);
+    lv_obj_set_style_text_align(*state, LV_TEXT_ALIGN_RIGHT, 0);
+
+    *value = mk_label(c, "--", 2, 17, F_S);
+    lv_obj_set_width(*value, 138);
+    lv_label_set_long_mode(*value, LV_LABEL_LONG_DOT);
+
+    return c;
+}
+
 void build_sensors() {
     lv_obj_t *s = mk_screen();
     hdr(s, "Sensores", SCR_HOME);
-    for (int i = 0; i < 9; ++i) {
-        ws.ln[i] = mk_label(s, "--", 8, 34 + i * 20, F_S);
-        lv_label_set_long_mode(ws.ln[i], LV_LABEL_LONG_DOT);
-        lv_obj_set_width(ws.ln[i], 304);
-    }
+
+    sensor_card(s, 8,   34,  "pH",       &ws.phValue,    &ws.phState);
+    sensor_card(s, 162, 34,  "TDS/EC",   &ws.tdsValue,   &ws.tdsState);
+
+    sensor_card(s, 8,   84,  "Agua",     &ws.waterValue, &ws.waterState);
+    sensor_card(s, 162, 84,  "Ambiente", &ws.airValue,   &ws.airState);
+
+    sensor_card(s, 8,   134, "Nivel",    &ws.levelValue, &ws.levelState);
+    sensor_card(s, 162, 134, "Sistema",  &ws.sysValue,   &ws.sysState);
+
+    lv_obj_t *b1 = mk_btn(s, 8, 190, 148, 28, false);
+    lv_label_set_text(lv_label_create(b1), "Actualizar");
+    lv_obj_center(lv_obj_get_child(b1, 0));
+    lv_obj_add_event_cb(b1, [](lv_event_t *) {
+        send_cmd("CMD:GET_STATUS");
+        if (ws.msg) lv_label_set_text(ws.msg, "GET_STATUS enviado");
+        ui_render_bump_activity();
+    }, LV_EVENT_CLICKED, nullptr);
+
+    lv_obj_t *b2 = mk_btn(s, 164, 190, 148, 28, true);
+    lv_label_set_text(lv_label_create(b2), "Calibrar");
+    lv_obj_center(lv_obj_get_child(b2, 0));
+    lv_obj_add_event_cb(
+        b2,
+        nav_cb,
+        LV_EVENT_CLICKED,
+        reinterpret_cast<void *>(static_cast<uintptr_t>(SCR_CALIBRATION))
+    );
+
+    ws.msg = mk_label(s, "Panel diagnostico HMI/UNO R4", 8, 222, F_S);
+    lv_obj_set_width(ws.msg, 304);
+    lv_label_set_long_mode(ws.msg, LV_LABEL_LONG_DOT);
+    lv_obj_set_style_text_color(ws.msg, C_MUT, 0);
+
     g_scr[SCR_SENSORS] = s;
 }
 
@@ -500,34 +558,67 @@ void act_sw(lv_event_t *e) {
     send_cmd(b);
 }
 
+void style_act_switch(lv_obj_t *sw) {
+    lv_obj_set_style_bg_color(sw, C_BR, LV_PART_MAIN);
+    lv_obj_set_style_bg_opa(sw, LV_OPA_COVER, LV_PART_MAIN);
+
+    lv_obj_set_style_bg_color(sw, C_MUT, LV_PART_INDICATOR);
+    lv_obj_set_style_bg_opa(sw, LV_OPA_60, LV_PART_INDICATOR);
+
+    lv_obj_set_style_bg_color(sw, C_ACC, LV_PART_INDICATOR | LV_STATE_CHECKED);
+    lv_obj_set_style_bg_opa(sw, LV_OPA_COVER, LV_PART_INDICATOR | LV_STATE_CHECKED);
+
+    lv_obj_set_style_bg_color(sw, C_CARD, LV_PART_KNOB);
+    lv_obj_set_style_bg_opa(sw, LV_OPA_COVER, LV_PART_KNOB);
+}
+
+void actuator_line_cell(lv_obj_t *parent, int index, lv_coord_t x, lv_coord_t y) {
+    lv_obj_t *card = mk_card(parent, x, y, 148, 34);
+    lv_obj_clear_flag(card, LV_OBJ_FLAG_SCROLLABLE);
+
+    lv_obj_t *lb = mk_label(card, kActNm[index], 0, 0, F_S);
+    lv_obj_set_width(lb, 84);
+    lv_label_set_long_mode(lb, LV_LABEL_LONG_DOT);
+    lv_obj_set_style_text_align(lb, LV_TEXT_ALIGN_LEFT, 0);
+    lv_obj_align(lb, LV_ALIGN_LEFT_MID, 8, -1);
+
+    wact.sw[index] = lv_switch_create(card);
+    lv_obj_set_size(wact.sw[index], 34, 18);
+    style_act_switch(wact.sw[index]);
+    lv_obj_align(wact.sw[index], LV_ALIGN_RIGHT_MID, -10, 0);
+
+    lv_obj_add_event_cb(
+        wact.sw[index],
+        act_sw,
+        LV_EVENT_VALUE_CHANGED,
+        reinterpret_cast<void *>(static_cast<uintptr_t>(index))
+    );
+}
+
 void build_actuators() {
     lv_obj_t *s = mk_screen();
     hdr(s, "Actuadores", SCR_HOME);
-    wact.wrn = mk_label(s, "AUTO: salidas bloqueadas. Use MAN/MANT.", 8, 30, F_S);
-    lv_obj_set_style_text_color(wact.wrn, C_WRN, 0);
 
-    mk_label(s, "12V", 8, 48, F_S);
-    for (int i = 0; i < 6; ++i) {
-        lv_obj_t *row = mk_card(s, 48, 48 + i * 20, 264, 18);
-        mk_label(row, kActNm[i], 2, -1, F_S);
-        wact.sw[i] = lv_switch_create(row);
-        lv_obj_set_size(wact.sw[i], 42, 18);
-        lv_obj_set_pos(wact.sw[i], 210, -2);
-        lv_obj_add_event_cb(wact.sw[i], act_sw, LV_EVENT_VALUE_CHANGED, reinterpret_cast<void *>(static_cast<uintptr_t>(i)));
-    }
+    wact.wrn = mk_label(s, "Control manual de salidas", 8, 32, F_S);
+    lv_obj_set_width(wact.wrn, 304);
+    lv_label_set_long_mode(wact.wrn, LV_LABEL_LONG_DOT);
+    lv_obj_set_style_text_color(wact.wrn, C_MUT, 0);
 
-    mk_label(s, "220V", 8, 174, F_S);
-    for (int i = 6; i < 9; ++i) {
-        lv_obj_t *row = mk_card(s, 58 + (i - 6) * 84, 172, 78, 36);
-        lv_obj_t *lb = mk_label(row, kActNm[i], 2, 0, F_S);
-        lv_obj_set_width(lb, 42);
-        wact.sw[i] = lv_switch_create(row);
-        lv_obj_set_size(wact.sw[i], 34, 18);
-        lv_obj_set_pos(wact.sw[i], 36, 10);
-        lv_obj_add_event_cb(wact.sw[i], act_sw, LV_EVENT_VALUE_CHANGED, reinterpret_cast<void *>(static_cast<uintptr_t>(i)));
-    }
+    actuator_line_cell(s, 0,   8,  48);
+    actuator_line_cell(s, 1, 164,  48);
 
-    wact.sw[9] = nullptr;
+    actuator_line_cell(s, 2,   8,  84);
+    actuator_line_cell(s, 3, 164,  84);
+
+    actuator_line_cell(s, 4,   8, 120);
+    actuator_line_cell(s, 5, 164, 120);
+
+    actuator_line_cell(s, 6,   8, 156);
+    actuator_line_cell(s, 7, 164, 156);
+
+    actuator_line_cell(s, 8,   8, 192);
+    actuator_line_cell(s, 9, 164, 192);
+
     g_scr[SCR_ACTUATORS] = s;
 }
 
@@ -562,47 +653,52 @@ void build_automation() {
 
 void build_calibration() {
     lv_obj_t *s = mk_screen();
-    hdr(s, "Calibracion guiada", SCR_HOME);
+    hdr(s, "Calibracion Pro", SCR_HOME);
 
-    lv_obj_t *tv = lv_tabview_create(s, LV_DIR_TOP, 24);
-    lv_obj_set_pos(tv, 0, 28);
-    lv_obj_set_size(tv, 320, 210);
+    lv_obj_t *tv = lv_tabview_create(s, LV_DIR_TOP, 22);
+    lv_obj_set_pos(tv, 0, 29);
+    lv_obj_set_size(tv, 320, 209);
 
     lv_obj_t *t1 = lv_tabview_add_tab(tv, "pH");
     lv_obj_t *t2 = lv_tabview_add_tab(tv, "TDS");
-    lv_obj_t *t3 = lv_tabview_add_tab(tv, "Valores");
+    lv_obj_t *t3 = lv_tabview_add_tab(tv, "Estado");
     lv_obj_t *t4 = lv_tabview_add_tab(tv, "Reset");
 
     lv_obj_t *phInfo = mk_label(t1,
-        "Asistente pH UNO R4\n1) Modo mantenimiento\n2) Sonda en buffer 4.00\n3) Esperar estabilidad\n4) Repetir con 7.00",
-        8, 6, F_S);
+        "pH guiado: Mant. > Iniciar > Ajustar > Guardar",
+        4, 2, F_S);
     lv_label_set_long_mode(phInfo, LV_LABEL_LONG_WRAP);
-    lv_obj_set_width(phInfo, 286);
+    lv_obj_set_width(phInfo, 292);
 
-    lv_obj_t *bm = mk_btn(t1, 8, 92, 138, 28, false);
-    lv_label_set_text(lv_label_create(bm), "Modo mant.");
+    lv_obj_t *bm = mk_btn(t1, 4, 34, 92, 24, false);
+    lv_label_set_text(lv_label_create(bm), "Mant.");
     lv_obj_center(lv_obj_get_child(bm, 0));
     lv_obj_add_event_cb(bm, cmd_cb, LV_EVENT_CLICKED, (void *)"CMD:SET_MAINT:1");
 
-    lv_obj_t *bs = mk_btn(t1, 154, 92, 138, 28, true);
-    lv_label_set_text(lv_label_create(bs), "Iniciar pH");
+    lv_obj_t *bs = mk_btn(t1, 102, 34, 92, 24, true);
+    lv_label_set_text(lv_label_create(bs), "Iniciar");
     lv_obj_center(lv_obj_get_child(bs, 0));
     lv_obj_add_event_cb(bs, cmd_cb, LV_EVENT_CLICKED, (void *)"CMD:CAL_PH_START");
 
-    mk_label(t1, "Offset", 8, 130, F_S);
+    lv_obj_t *brd = mk_btn(t1, 200, 34, 92, 24, false);
+    lv_label_set_text(lv_label_create(brd), "Leer");
+    lv_obj_center(lv_obj_get_child(brd, 0));
+    lv_obj_add_event_cb(brd, cmd_cb, LV_EVENT_CLICKED, (void *)"CMD:GET_STATUS");
+
+    mk_label(t1, "Offset", 4, 72, F_S);
     g_sl_coff = lv_slider_create(t1);
     lv_slider_set_range(g_sl_coff, -3000, 3500);
-    lv_obj_set_pos(g_sl_coff, 68, 134);
-    lv_obj_set_size(g_sl_coff, 222, 10);
+    lv_obj_set_pos(g_sl_coff, 68, 77);
+    lv_obj_set_size(g_sl_coff, 224, 10);
 
-    mk_label(t1, "Pend.", 8, 154, F_S);
+    mk_label(t1, "Pend.", 4, 102, F_S);
     g_sl_cslope = lv_slider_create(t1);
     lv_slider_set_range(g_sl_cslope, -1000, 500);
-    lv_obj_set_pos(g_sl_cslope, 68, 158);
-    lv_obj_set_size(g_sl_cslope, 222, 10);
+    lv_obj_set_pos(g_sl_cslope, 68, 107);
+    lv_obj_set_size(g_sl_cslope, 224, 10);
 
-    lv_obj_t *bphSave = mk_btn(t1, 8, 176, 284, 28, true);
-    lv_label_set_text(lv_label_create(bphSave), "Guardar calibracion pH");
+    lv_obj_t *bphSave = mk_btn(t1, 4, 140, 288, 28, true);
+    lv_label_set_text(lv_label_create(bphSave), "Guardar pH en UNO R4");
     lv_obj_center(lv_obj_get_child(bphSave, 0));
     lv_obj_add_event_cb(bphSave, [](lv_event_t *) {
         SystemSettings ss = readSettings();
@@ -610,30 +706,47 @@ void build_calibration() {
         ss.ph_slope  = static_cast<float>(lv_slider_get_value(g_sl_cslope)) / 100.0f;
         ss.calibration_dirty = true;
         saveSettings(ss);
+
         char buf[56];
         snprintf(buf, sizeof(buf), "CMD:CAL_PH_SAVE:%.3f:%.3f", ss.ph_offset, ss.ph_slope);
         send_cmd(buf);
+
         if (wcal.status) lv_label_set_text(wcal.status, "pH guardado y enviado a UNO R4");
     }, LV_EVENT_CLICKED, nullptr);
 
     lv_obj_t *tdsInfo = mk_label(t2,
-        "Calibracion TDS/EC\nUse solucion patron. Ajuste el factor solo si la lectura estable difiere del patron.",
-        8, 8, F_S);
+        "TDS/EC: iniciar, ajustar factor y guardar",
+        4, 2, F_S);
     lv_label_set_long_mode(tdsInfo, LV_LABEL_LONG_WRAP);
-    lv_obj_set_width(tdsInfo, 286);
+    lv_obj_set_width(tdsInfo, 292);
 
-    lv_obj_t *bt = mk_btn(t2, 8, 64, 138, 30, true);
-    lv_label_set_text(lv_label_create(bt), "Iniciar TDS");
+    lv_obj_t *bt = mk_btn(t2, 4, 34, 92, 24, true);
+    lv_label_set_text(lv_label_create(bt), "Iniciar");
     lv_obj_center(lv_obj_get_child(bt, 0));
     lv_obj_add_event_cb(bt, cmd_cb, LV_EVENT_CLICKED, (void *)"CMD:CAL_TDS_START");
 
-    mk_label(t2, "Factor x0.01", 8, 108, F_S);
+    lv_obj_t *btr = mk_btn(t2, 102, 34, 92, 24, false);
+    lv_label_set_text(lv_label_create(btr), "Leer UNO");
+    lv_obj_center(lv_obj_get_child(btr, 0));
+    lv_obj_add_event_cb(btr, cmd_cb, LV_EVENT_CLICKED, (void *)"CMD:GET_STATUS");
+
+    lv_obj_t *btm = mk_btn(t2, 200, 34, 92, 24, false);
+    lv_label_set_text(lv_label_create(btm), "Mant.");
+    lv_obj_center(lv_obj_get_child(btm, 0));
+    lv_obj_add_event_cb(btm, cmd_cb, LV_EVENT_CLICKED, (void *)"CMD:SET_MAINT:1");
+
+    mk_label(t2, "Factor", 4, 78, F_S);
     g_sl_tdsf = lv_slider_create(t2);
     lv_slider_set_range(g_sl_tdsf, 50, 400);
-    lv_obj_set_pos(g_sl_tdsf, 8, 130);
-    lv_obj_set_size(g_sl_tdsf, 284, 10);
+    lv_obj_set_pos(g_sl_tdsf, 68, 84);
+    lv_obj_set_size(g_sl_tdsf, 224, 10);
 
-    lv_obj_t *btdsSave = mk_btn(t2, 8, 164, 284, 30, true);
+    lv_obj_t *tdsScale = mk_label(t2, "x0.01  rango 0.50 a 4.00", 68, 104, F_S);
+    lv_obj_set_style_text_color(tdsScale, C_MUT, 0);
+    lv_obj_set_width(tdsScale, 224);
+    lv_label_set_long_mode(tdsScale, LV_LABEL_LONG_DOT);
+
+    lv_obj_t *btdsSave = mk_btn(t2, 4, 140, 288, 28, true);
     lv_label_set_text(lv_label_create(btdsSave), "Guardar factor TDS");
     lv_obj_center(lv_obj_get_child(btdsSave, 0));
     lv_obj_add_event_cb(btdsSave, [](lv_event_t *) {
@@ -641,26 +754,41 @@ void build_calibration() {
         ss.tds_cal_factor = static_cast<float>(lv_slider_get_value(g_sl_tdsf)) / 100.0f;
         ss.calibration_dirty = true;
         saveSettings(ss);
+
         char buf[44];
         snprintf(buf, sizeof(buf), "CMD:CAL_TDS_SAVE:%.4f", ss.tds_cal_factor);
         send_cmd(buf);
+
         if (wcal.status) lv_label_set_text(wcal.status, "TDS guardado y enviado a UNO R4");
     }, LV_EVENT_CLICKED, nullptr);
 
-    wcal.values = mk_label(t3, "--", 8, 8, F_S);
+    wcal.values = mk_label(t3, "--", 4, 4, F_S);
     lv_label_set_long_mode(wcal.values, LV_LABEL_LONG_WRAP);
-    lv_obj_set_width(wcal.values, 286);
-    wcal.status = mk_label(t3, "Listo para calibrar.", 8, 118, F_S);
+    lv_obj_set_width(wcal.values, 292);
+
+    lv_obj_t *bStatus = mk_btn(t3, 4, 126, 140, 24, false);
+    lv_label_set_text(lv_label_create(bStatus), "Leer UNO");
+    lv_obj_center(lv_obj_get_child(bStatus, 0));
+    lv_obj_add_event_cb(bStatus, cmd_cb, LV_EVENT_CLICKED, (void *)"CMD:GET_STATUS");
+
+    lv_obj_t *bMaint = mk_btn(t3, 152, 126, 140, 24, true);
+    lv_label_set_text(lv_label_create(bMaint), "Modo Mant.");
+    lv_obj_center(lv_obj_get_child(bMaint, 0));
+    lv_obj_add_event_cb(bMaint, cmd_cb, LV_EVENT_CLICKED, (void *)"CMD:SET_MAINT:1");
+
+    wcal.status = mk_label(t3, "Listo.", 4, 156, F_S);
+    lv_obj_set_width(wcal.status, 292);
+    lv_label_set_long_mode(wcal.status, LV_LABEL_LONG_DOT);
     lv_obj_set_style_text_color(wcal.status, C_ACC, 0);
 
     wcal.resetMsg = mk_label(t4,
-        "Reset seguro:\nPrimer toque arma la restauracion.\nSegundo toque confirma.",
-        8, 8, F_S);
+        "Reset seguro de calibracion.\nPrimer toque: arma.\nSegundo toque: confirma.",
+        4, 6, F_S);
     lv_label_set_long_mode(wcal.resetMsg, LV_LABEL_LONG_WRAP);
-    lv_obj_set_width(wcal.resetMsg, 286);
+    lv_obj_set_width(wcal.resetMsg, 292);
 
-    lv_obj_t *br = mk_btn(t4, 8, 100, 284, 34, true);
-    lv_label_set_text(lv_label_create(br), "Restaurar fabrica");
+    lv_obj_t *br = mk_btn(t4, 4, 78, 288, 30, true);
+    lv_label_set_text(lv_label_create(br), "Restaurar calibracion fabrica");
     lv_obj_center(lv_obj_get_child(br, 0));
     lv_obj_add_event_cb(br, [](lv_event_t *) {
         if (!s_reset_armed) {
@@ -668,17 +796,28 @@ void build_calibration() {
             if (wcal.resetMsg) lv_label_set_text(wcal.resetMsg, "Reset armado. Pulse nuevamente para confirmar.");
             return;
         }
+
         s_reset_armed = false;
+
         SystemSettings ss = readSettings();
         ss.ph_offset = 21.340f;
         ss.ph_slope = -5.700f;
         ss.tds_cal_factor = 1.0000f;
         ss.calibration_dirty = true;
         saveSettings(ss);
+
         send_cmd("CMD:CAL_PH_SAVE:21.340:-5.700");
         send_cmd("CMD:CAL_TDS_SAVE:1.0000");
+
         if (wcal.resetMsg) lv_label_set_text(wcal.resetMsg, "Calibracion restaurada y enviada a UNO R4.");
     }, LV_EVENT_CLICKED, nullptr);
+
+    lv_obj_t *backInfo = mk_label(t4,
+        "Use reset solo si la medicion quedo fuera de rango.",
+        4, 124, F_S);
+    lv_obj_set_style_text_color(backInfo, C_MUT, 0);
+    lv_label_set_long_mode(backInfo, LV_LABEL_LONG_WRAP);
+    lv_obj_set_width(backInfo, 292);
 
     g_scr[SCR_CALIBRATION] = s;
 }
@@ -922,17 +1061,80 @@ void tick_dashboard(const SystemState &st, uint32_t now) {
     lblf(wd.action, "Ultima accion: %s", st.last_action);
 }
 
+void set_sensor_state(lv_obj_t *label, const char *txt, lv_color_t color) {
+    if (!label) return;
+    lv_label_set_text(label, txt);
+    lv_obj_set_style_text_color(label, color, 0);
+}
+
 void tick_sensors(const SystemState &st, uint32_t now) {
-    if (!ws.ln[0]) return;
-    lblf(ws.ln[0], "pH: %s %.2f", st.ph_probe_ok ? "OK" : "invalido", st.ph);
-    lblf(ws.ln[1], "TDS/EC: %s %d ppm | %.2f mS", st.tds_probe_ok ? "OK" : "invalido", st.tds, st.tds / 500.0f);
-    lblf(ws.ln[2], "T agua: %.1f C | sonda %s", st.temp_water, st.tw_probe_ok ? "OK" : "invalida");
-    lblf(ws.ln[3], "T aire: %.1f C | DHT %s", st.temp_air, st.dht_online ? "OK" : "OFF");
-    lblf(ws.ln[4], "Humedad: %.0f %%", st.hum_air);
-    lblf(ws.ln[5], "Nivel min:%s max:%s", st.level_min ? "ON" : "ok", st.level_max ? "ON" : "ok");
-    lblf(ws.ln[6], "RTC UNO R4: %s | Hora: %s", st.rtc_online ? "OK" : "no OK", st.controller_clock[0] ? st.controller_clock : "--");
-    lblf(ws.ln[7], "Telemetria: %s | hace %lus", st.telemetry_live ? "viva" : "sin datos", (unsigned long)((now - st.uart_last_rx_ms) / 1000UL));
-    lblf(ws.ln[8], "Paquetes UART OK:%lu ERR:%lu", (unsigned long)st.uart_ok_packets, (unsigned long)st.uart_bad_packets);
+    if (!ws.phValue) return;
+
+    const bool live = st.telemetry_live;
+    const unsigned long age = live ? (unsigned long)((now - st.uart_last_rx_ms) / 1000UL) : 0UL;
+
+    if (live && st.ph_probe_ok) {
+        lblf(ws.phValue, "%.2f", st.ph);
+        set_sensor_state(ws.phState, phOk(st) ? "OK" : "REV", phOk(st) ? C_OK : C_WRN);
+    } else {
+        lv_label_set_text(ws.phValue, "--");
+        set_sensor_state(ws.phState, live ? "REV" : "OFF", live ? C_WRN : C_ERR);
+    }
+
+    if (live && st.tds_probe_ok) {
+        lblf(ws.tdsValue, "%d ppm | %.2f mS", st.tds, st.tds / 500.0f);
+        set_sensor_state(ws.tdsState, tdsOk(st) ? "OK" : "REV", tdsOk(st) ? C_OK : C_WRN);
+    } else {
+        lv_label_set_text(ws.tdsValue, "--");
+        set_sensor_state(ws.tdsState, live ? "REV" : "OFF", live ? C_WRN : C_ERR);
+    }
+
+    if (live && st.tw_probe_ok) {
+        lblf(ws.waterValue, "%.1f C", st.temp_water);
+        set_sensor_state(ws.waterState, "OK", C_OK);
+    } else {
+        lv_label_set_text(ws.waterValue, "--");
+        set_sensor_state(ws.waterState, live ? "REV" : "OFF", live ? C_WRN : C_ERR);
+    }
+
+    if (live && st.dht_online) {
+        lblf(ws.airValue, "%.1f C | %.0f%%", st.temp_air, st.hum_air);
+        set_sensor_state(ws.airState, "OK", C_OK);
+    } else {
+        lv_label_set_text(ws.airValue, "--");
+        set_sensor_state(ws.airState, "OFF", C_ERR);
+    }
+
+    lblf(ws.levelValue, "Min:%s Max:%s", st.level_min ? "ON" : "ok", st.level_max ? "ON" : "ok");
+    if (st.level_min) {
+        set_sensor_state(ws.levelState, "BAJO", C_ERR);
+    } else if (st.level_max) {
+        set_sensor_state(ws.levelState, "ALTO", C_WRN);
+    } else {
+        set_sensor_state(ws.levelState, "OK", C_OK);
+    }
+
+    lblf(ws.sysValue, "UART %s | RTC %s", live ? "OK" : "OFF", st.rtc_online ? "OK" : "REV");
+    if (live && st.rtc_online) {
+        set_sensor_state(ws.sysState, "OK", C_OK);
+    } else if (live) {
+        set_sensor_state(ws.sysState, "REV", C_WRN);
+    } else {
+        set_sensor_state(ws.sysState, "OFF", C_ERR);
+    }
+
+    if (ws.msg) {
+        if (live) {
+            lblf(ws.msg, "Telemetria hace %lus | OK:%lu ERR:%lu",
+                 age,
+                 (unsigned long)st.uart_ok_packets,
+                 (unsigned long)st.uart_bad_packets);
+            lv_obj_set_style_text_color(ws.msg, C_MUT, 0);
+        } else {
+            lv_label_set_text(ws.msg, "Sin telemetria UART. Pulse Actualizar.");
+            lv_obj_set_style_text_color(ws.msg, C_WRN, 0);
+        }
+    }
 }
 
 void tick_actuators(const SystemState &st) {
@@ -965,9 +1167,18 @@ void tick_auto(const SystemState &st, uint32_t now) {
 
 void tick_cal(const SystemSettings &ss, const SystemState &st) {
     if (!wcal.values) return;
+
     lblf(wcal.values,
-         "Lectura actual\npH %.2f | TDS %d ppm\n\nCalibracion guardada\npH offset %.3f\npH pendiente %.3f\nTDS factor %.4f\nRefs pH %.2f / %.2f",
-         st.ph, st.tds, ss.ph_offset, ss.ph_slope, ss.tds_cal_factor, ss.ph_cal_ref1, ss.ph_cal_ref2);
+         "Estado sensores\npH %.2f | TDS %d ppm\nAgua %.1fC | Aire %.1fC %.0f%%\nCal pH off %.2f | pend %.2f\nTDS factor %.3f | RTC %s",
+         st.ph,
+         st.tds,
+         st.temp_water,
+         st.temp_air,
+         st.hum_air,
+         ss.ph_offset,
+         ss.ph_slope,
+         ss.tds_cal_factor,
+         st.rtc_online ? "OK" : "REV");
 }
 
 void tick_alarms(const SystemState &st) {

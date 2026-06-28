@@ -35,8 +35,17 @@ void settingsLoadInto(SystemSettings &s) {
     s.uart_tx_pin           = getChar(p, "u_tx", s.uart_tx_pin);
     s.brightness_pct        = static_cast<uint8_t>(p.getUChar("bright", s.brightness_pct));
     s.ui_idle_timeout_ms    = getUInt(p, "idle_ms", s.ui_idle_timeout_ms);
+
+    s.ph_cal_ref1           = getFloat(p, "ph_r1", s.ph_cal_ref1);
+    s.ph_cal_ref2           = getFloat(p, "ph_r2", s.ph_cal_ref2);
+    s.ph_offset             = getFloat(p, "ph_off", s.ph_offset);
     s.ph_slope              = getFloat(p, "ph_slope", s.ph_slope);
+    s.ec_offset             = getFloat(p, "ec_off", s.ec_offset);
     s.tds_cal_factor        = getFloat(p, "tds_fact", s.tds_cal_factor);
+    s.temp_water_offset     = getFloat(p, "tw_off", s.temp_water_offset);
+    s.temp_air_offset       = getFloat(p, "ta_off", s.temp_air_offset);
+    s.hum_air_offset        = getFloat(p, "ha_off", s.hum_air_offset);
+    s.calibration_dirty     = p.getBool("cal_dirty", s.calibration_dirty);
 
     for (int i = 0; i < 5; ++i) {
         char k[16];
@@ -48,6 +57,8 @@ void settingsLoadInto(SystemSettings &s) {
 
     p.end();
 }
+
+
 
 void settingsSaveFrom(const SystemSettings &s) {
     Preferences p;
@@ -72,8 +83,17 @@ void settingsSaveFrom(const SystemSettings &s) {
     putChar(p, "u_tx", s.uart_tx_pin);
     p.putUChar("bright", s.brightness_pct);
     putUInt(p, "idle_ms", s.ui_idle_timeout_ms);
+
+    putFloat(p, "ph_r1", s.ph_cal_ref1);
+    putFloat(p, "ph_r2", s.ph_cal_ref2);
+    putFloat(p, "ph_off", s.ph_offset);
     putFloat(p, "ph_slope", s.ph_slope);
+    putFloat(p, "ec_off", s.ec_offset);
     putFloat(p, "tds_fact", s.tds_cal_factor);
+    putFloat(p, "tw_off", s.temp_water_offset);
+    putFloat(p, "ta_off", s.temp_air_offset);
+    putFloat(p, "ha_off", s.hum_air_offset);
+    p.putBool("cal_dirty", s.calibration_dirty);
 
     for (int i = 0; i < 5; ++i) {
         char k[16];
@@ -85,3 +105,5 @@ void settingsSaveFrom(const SystemSettings &s) {
 
     p.end();
 }
+
+

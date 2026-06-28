@@ -69,10 +69,10 @@ struct WiFiConfig {
 
 struct SystemState {
     float ph          = 0.0f;
-    /** PPM/TDS entero derivado de telemetría del controlador UNO R4 */
+    /** PPM/TDS entero derivado de telemetrÃƒÆ’Ã‚Â­a del controlador UNO R4 */
     int   tds         = 0;
     float temp_water  = 0.0f;
-    /** Temperatura NTC modulo PH-4502C (pin TO), °C */
+    /** Temperatura NTC modulo PH-4502C (pin TO), Ãƒâ€šÃ‚Â°C */
     float temp_water_probe = 0.0f;
     float temp_air    = 0.0f;
     float hum_air     = 0.0f;
@@ -91,7 +91,7 @@ struct SystemState {
     bool state_pump_b        = false;
     bool state_ph_up         = false;
     bool state_ph_down       = false;
-    /** Buzzer / relé BUZ del controlador UNO R4 */
+    /** Buzzer / relÃƒÆ’Ã‚Â© BUZ del controlador UNO R4 */
     bool state_buzzer        = false;
     bool auto_mode           = false;
     bool maintenance_mode    = false;
@@ -106,7 +106,7 @@ struct SystemState {
     /** Contadores del controlador I/O. Nombres legados preservados por compatibilidad. */
     uint8_t ph_corrections_mega = 0;
     uint8_t tds_corrections_mega = 0;
-    /** Hora RTC del controlador "HH:MM:SS" o vacío */
+    /** Hora RTC del controlador "HH:MM:SS" o vacÃƒÆ’Ã‚Â­o */
     char controller_clock[12] = "";
 
     /** DHT22 en UNO R4; si el STS no trae DHT= se asume true (compat firmware antiguo). */
@@ -140,7 +140,7 @@ struct SystemState {
     uint32_t uptime_seconds = 0;
     uint32_t history_count  = 0;
 
-    /** Historial corto de alarmas (más reciente primero) */
+    /** Historial corto de alarmas (mÃƒÆ’Ã‚Â¡s reciente primero) */
     static constexpr int kAlarmHist = 5;
     char     alarm_history[kAlarmHist][40] = {};
     uint8_t  alarm_history_count = 0;
@@ -172,10 +172,10 @@ struct SystemSettings {
 
     float ph_cal_ref1       = 4.00f;
     float ph_cal_ref2       = 7.00f;
-    float ph_offset         = 0.0f;
-    float ph_slope          = 1.0f;
+    float ph_offset         = 21.34f;
+    float ph_slope          = -5.70f;
     float ec_offset         = 0.0f;
-    float tds_cal_factor    = 1.0f;
+    float tds_cal_factor    = 1.00f;
     float temp_water_offset = 0.0f;
     float temp_air_offset   = 0.0f;
     float hum_air_offset    = 0.0f;

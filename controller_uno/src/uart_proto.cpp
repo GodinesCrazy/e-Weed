@@ -12,7 +12,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-/** Calibración viva (definida en main.cpp). */
+/** CalibraciÃƒÆ’Ã‚Â³n viva (definida en main.cpp). */
 extern CalibrationData g_calibration;
 
 namespace {
@@ -419,10 +419,14 @@ void UartProto_processCommandLine(char *line, bool fromHmi) {
     Automation::onAlarmCleared();
     UartProto_sendAck("ACK_ALARM");
     return;
-  }
-  if (strcmp(line, "CAL_PH_START") == 0) {
+  }  if (strcmp(line, "CAL_PH_START") == 0) {
     Automation::setLastAction("Calibracion pH iniciada");
     UartProto_sendAck("CAL_PH_START");
+    return;
+  }
+  if (strcmp(line, "CAL_TDS_START") == 0) {
+    Automation::setLastAction("Calibracion TDS iniciada");
+    UartProto_sendAck("CAL_TDS_START");
     return;
   }
   if (strcmp(line, "SAFE_RELEASE") == 0) {
@@ -479,7 +483,7 @@ void UartProto_processCommandLine(char *line, bool fromHmi) {
     return;
   }
 
-  if (strncmp(line, "CAL_PH_SAVE:", 12) == 0) {
+    if (strncmp(line, "CAL_PH_SAVE:", 12) == 0) {
     char *ctx = nullptr;
     char *first = strtok_r(line + 12, ":", &ctx);
     char *second = strtok_r(nullptr, ":", &ctx);
@@ -487,14 +491,26 @@ void UartProto_processCommandLine(char *line, bool fromHmi) {
       UartProto_sendErr("BAD_CAL_PH");
       return;
     }
-    g_calibration.phOffset = static_cast<float>(atof(first));
-    g_calibration.phSlope  = static_cast<float>(atof(second));
+
+    const float newOffset = static_cast<float>(atof(first));
+    const float newSlope  = static_cast<float>(atof(second));
+
+    if (isnan(newOffset) || isnan(newSlope) ||
+        newOffset < -20.0f || newOffset > 50.0f ||
+        newSlope < -20.0f || newSlope > -0.05f) {
+      UartProto_sendErr("BAD_CAL_PH_RANGE");
+      return;
+    }
+
+    g_calibration.phOffset = newOffset;
+    g_calibration.phSlope  = newSlope;
     Storage::saveCalibration(g_calibration);
+    Automation::setLastAction("Calibracion pH guardada");
     UartProto_sendAck("CAL_PH_SAVE");
     return;
   }
 
-  if (strncmp(line, "CAL_TDS_SAVE:", 13) == 0) {
+    if (strncmp(line, "CAL_TDS_SAVE:", 13) == 0) {
     g_calibration.tdsFactor = static_cast<float>(atof(line + 13));
     if (isnan(g_calibration.tdsFactor) || g_calibration.tdsFactor < 0.05f ||
         g_calibration.tdsFactor > 20.0f) {
@@ -502,6 +518,7 @@ void UartProto_processCommandLine(char *line, bool fromHmi) {
       return;
     }
     Storage::saveCalibration(g_calibration);
+    Automation::setLastAction("Calibracion TDS guardada");
     UartProto_sendAck("CAL_TDS_SAVE");
     return;
   }
