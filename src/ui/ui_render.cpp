@@ -147,6 +147,15 @@ static lv_obj_t *g_sl_coff    = nullptr;
 static lv_obj_t *g_sl_cslope  = nullptr;
 static lv_obj_t *g_sl_tdsf    = nullptr;
 
+static int       g_stage_edit      = 0;
+static lv_obj_t *g_stage_name_lbl  = nullptr;
+static lv_obj_t *g_stage_ph_lbl    = nullptr;
+static lv_obj_t *g_stage_tds_lbl   = nullptr;
+static lv_obj_t *g_stage_hint_lbl  = nullptr;
+static lv_obj_t *g_stage_msg_lbl   = nullptr;
+static lv_obj_t *g_sl_stage_ph     = nullptr;
+static lv_obj_t *g_sl_stage_tds    = nullptr;
+
 constexpr const char *kActKey[] = {"PA", "PB", "PHU", "PHD", "REC", "PIN", "LUZ", "INT", "EXT", "BUZ"};
 constexpr const char *kActNm[]  = {"Nutr. A", "Nutr. B", "pH+", "pH-", "Recirc.", "Agua+", "Luz", "Int.", "Ext.", "Buzzer"};
 bool s_act_sync = false;
@@ -421,7 +430,7 @@ void build_home() {
     tile(s, 162, 36, "Sensores", SCR_SENSORS);
     tile(s, 8, 80, "Actuadores", SCR_ACTUATORS);
     tile(s, 162, 80, "Automatizacion", SCR_AUTOMATION);
-    tile(s, 8, 124, "Calibracion", SCR_CALIBRATION, true);
+    tile(s, 8, 124, "Calibracion", SCR_CALIBRATION);
     tile(s, 162, 124, "Alarmas", SCR_ALARMS);
     tile(s, 8, 168, "Ajustes", SCR_SETTINGS_HUB);
     tile(s, 162, 168, "Mantenimiento", SCR_MAINTENANCE);
@@ -836,47 +845,319 @@ void build_alarms() {
     g_scr[SCR_ALARMS] = s;
 }
 
-void hub_item(lv_obj_t *p, lv_coord_t y, const char *txt, ScreenId to) {
-    lv_obj_t *b = mk_btn(p, 8, y, 304, 23, false);
-    lv_obj_t *l = lv_label_create(b);
-    lv_label_set_text(l, txt);
-    lv_obj_align(l, LV_ALIGN_LEFT_MID, 6, 0);
+void settings_card(lv_obj_t *p, lv_coord_t x, lv_coord_t y, lv_coord_t w, lv_coord_t h,
+                   const char *title, const char *sub, ScreenId to, bool pri = false) {
+    lv_obj_t *b = mk_btn(p, x, y, w, h, pri);
+
+    lv_obj_t *t = lv_label_create(b);
+    lv_label_set_text(t, title);
+    lv_obj_set_style_text_font(t, F_S, 0);
+    lv_obj_set_style_text_color(t, pri ? (s_dark ? lv_color_hex(0x0d1117) : lv_color_white()) : C_TXT, 0);
+    lv_obj_set_pos(t, 8, 4);
+    lv_obj_set_width(t, w - 30);
+    lv_label_set_long_mode(t, LV_LABEL_LONG_DOT);
+
+    lv_obj_t *d = lv_label_create(b);
+    lv_label_set_text(d, sub);
+    lv_obj_set_style_text_font(d, F_S, 0);
+    lv_obj_set_style_text_color(d, pri ? (s_dark ? lv_color_hex(0x0d1117) : lv_color_white()) : C_MUT, 0);
+    lv_obj_set_pos(d, 8, 22);
+    lv_obj_set_width(d, w - 34);
+    lv_label_set_long_mode(d, LV_LABEL_LONG_DOT);
+
+    lv_obj_t *a = lv_label_create(b);
+    lv_label_set_text(a, ">");
+    lv_obj_set_style_text_font(a, F_S, 0);
+    lv_obj_align(a, LV_ALIGN_RIGHT_MID, -8, 0);
+
+    lv_obj_add_event_cb(b, nav_cb, LV_EVENT_CLICKED, reinterpret_cast<void *>(static_cast<uintptr_t>(to)));
+}
+
+void settings_row(lv_obj_t *p, lv_coord_t y, const char *title, const char *sub, ScreenId to, bool pri = false) {
+    lv_obj_t *b = mk_btn(p, 8, y, 304, 36, pri);
+
+    lv_obj_t *t = lv_label_create(b);
+    lv_label_set_text(t, title);
+    lv_obj_set_style_text_font(t, F_S, 0);
+    lv_obj_set_pos(t, 10, 3);
+    lv_obj_set_width(t, 258);
+    lv_label_set_long_mode(t, LV_LABEL_LONG_DOT);
+
+    lv_obj_t *d = lv_label_create(b);
+    lv_label_set_text(d, sub);
+    lv_obj_set_style_text_font(d, F_S, 0);
+    lv_obj_set_style_text_color(d, pri ? (s_dark ? lv_color_hex(0x0d1117) : lv_color_white()) : C_MUT, 0);
+    lv_obj_set_pos(d, 10, 19);
+    lv_obj_set_width(d, 258);
+    lv_label_set_long_mode(d, LV_LABEL_LONG_DOT);
+
+    lv_obj_t *a = lv_label_create(b);
+    lv_label_set_text(a, ">");
+    lv_obj_align(a, LV_ALIGN_RIGHT_MID, -10, 0);
+
     lv_obj_add_event_cb(b, nav_cb, LV_EVENT_CLICKED, reinterpret_cast<void *>(static_cast<uintptr_t>(to)));
 }
 
 void build_settings_hub() {
     lv_obj_t *s = mk_screen();
     hdr(s, "Ajustes", SCR_HOME);
-    int y = 34;
-    hub_item(s, y, "Objetivos por etapa", SCR_SET_STAGE); y += 25;
-    hub_item(s, y, "Limites de seguridad", SCR_SET_SAFETY); y += 25;
-    hub_item(s, y, "Recirculacion", SCR_SET_RECIRC); y += 25;
-    hub_item(s, y, "Estabilizacion", SCR_SET_STAB); y += 25;
-    hub_item(s, y, "Microdosis", SCR_SET_MICRO); y += 25;
-    hub_item(s, y, "Fotoperiodo", SCR_SET_PHOTO); y += 25;
-    hub_item(s, y, "Ventilacion", SCR_SET_VENT); y += 25;
-    hub_item(s, y, "Comunicacion / WiFi", SCR_SET_COMM); y += 25;
-    hub_item(s, y, "Pantalla y sonido", SCR_SET_DISPLAY);
+
+    lv_obj_t *hint = mk_label(s, "Categorias principales", 8, 32, F_S);
+    lv_obj_set_width(hint, 304);
+    lv_obj_set_style_text_color(hint, C_MUT, 0);
+    lv_label_set_long_mode(hint, LV_LABEL_LONG_DOT);
+
+    settings_card(s, 8,   50, 148, 46, "Cultivo",      "objetivos por etapa", SCR_SET_STAGE, true);
+    settings_card(s, 164, 50, 148, 46, "Seguridad",    "limites y alarmas",    SCR_SET_SAFETY);
+
+    settings_card(s, 8,   104, 148, 46, "Dosificacion", "recirc. estabil. micro", SCR_SET_DOSING);
+    settings_card(s, 164, 104, 148, 46, "Clima",        "luz y ventilacion",   SCR_SET_CLIMATE);
+
+    settings_card(s, 8,   158, 148, 46, "Com/WiFi",     "red y telemetria",    SCR_SET_COMM);
+    settings_card(s, 164, 158, 148, 46, "Sistema",      "pantalla sonido info", SCR_SET_SYSTEM);
+
     g_scr[SCR_SETTINGS_HUB] = s;
+}
+
+void build_set_dosing() {
+    lv_obj_t *s = mk_screen();
+    hdr(s, "Dosificacion", SCR_SETTINGS_HUB);
+
+    lv_obj_t *hint = mk_label(s, "Ajustes de movimiento y dosificacion", 8, 34, F_S);
+    lv_obj_set_width(hint, 304);
+    lv_obj_set_style_text_color(hint, C_MUT, 0);
+    lv_label_set_long_mode(hint, LV_LABEL_LONG_DOT);
+
+    settings_row(s, 58,  "Recirculacion",  "ciclos de movimiento de solucion", SCR_SET_RECIRC, true);
+    settings_row(s, 100, "Estabilizacion", "pausas antes de volver a medir", SCR_SET_STAB);
+    settings_row(s, 142, "Microdosis",     "cantidad base por pulso", SCR_SET_MICRO);
+
+    g_scr[SCR_SET_DOSING] = s;
+}
+
+void build_set_climate() {
+    lv_obj_t *s = mk_screen();
+    hdr(s, "Clima", SCR_SETTINGS_HUB);
+
+    lv_obj_t *hint = mk_label(s, "Control ambiental", 8, 34, F_S);
+    lv_obj_set_width(hint, 304);
+    lv_obj_set_style_text_color(hint, C_MUT, 0);
+    lv_label_set_long_mode(hint, LV_LABEL_LONG_DOT);
+
+    settings_row(s, 62,  "Fotoperiodo", "programacion de luz", SCR_SET_PHOTO, true);
+    settings_row(s, 104, "Ventilacion", "intractor y extractor", SCR_SET_VENT);
+
+    g_scr[SCR_SET_CLIMATE] = s;
+}
+
+void build_set_system() {
+    lv_obj_t *s = mk_screen();
+    hdr(s, "Sistema", SCR_SETTINGS_HUB);
+
+    lv_obj_t *hint = mk_label(s, "Preferencias de la HMI", 8, 34, F_S);
+    lv_obj_set_width(hint, 304);
+    lv_obj_set_style_text_color(hint, C_MUT, 0);
+    lv_label_set_long_mode(hint, LV_LABEL_LONG_DOT);
+
+    settings_row(s, 58,  "Pantalla",       "tema, brillo y reposo", SCR_SET_DISPLAY, true);
+    settings_row(s, 100, "Sonido",         "avisos y feedback", SCR_SET_SOUND);
+    settings_row(s, 142, "Info firmware",  "versiones y diagnostico", SCR_SYSTEM_INFO);
+
+    g_scr[SCR_SET_SYSTEM] = s;
 }
 
 void build_simple_settings(const char *title, const char *body, ScreenId id) {
     lv_obj_t *s = mk_screen();
     hdr(s, title, SCR_SETTINGS_HUB);
-    lv_obj_t *l = mk_label(s, body, 8, 38, F_S);
+
+    lv_obj_t *card = mk_card(s, 8, 42, 304, 150);
+
+    lv_obj_t *l = mk_label(card, body, 8, 8, F_S);
     lv_label_set_long_mode(l, LV_LABEL_LONG_WRAP);
-    lv_obj_set_width(l, 304);
+    lv_obj_set_width(l, 280);
+    lv_obj_set_style_text_color(l, C_TXT, 0);
+
+    lv_obj_t *note = mk_label(s, "Ajuste local HMI. El control fisico queda en UNO R4.", 8, 204, F_S);
+    lv_obj_set_width(note, 304);
+    lv_label_set_long_mode(note, LV_LABEL_LONG_DOT);
+    lv_obj_set_style_text_color(note, C_MUT, 0);
+
     g_scr[id] = s;
+}
+void stageEditorValueLabels() {
+    if (!g_stage_ph_lbl || !g_stage_tds_lbl || !g_sl_stage_ph || !g_sl_stage_tds) return;
+
+    const int ph100 = lv_slider_get_value(g_sl_stage_ph);
+    const int tds   = lv_slider_get_value(g_sl_stage_tds);
+
+    lblf(g_stage_ph_lbl, "pH %.2f", static_cast<float>(ph100) / 100.0f);
+    lblf(g_stage_tds_lbl, "%d ppm", tds);
+}
+
+void stageEditorLoad(int idx) {
+    g_stage_edit = clamp_stage(idx);
+
+    SystemSettings ss = readSettings();
+    const StageProfile &p = kStageProfiles[g_stage_edit];
+
+    int ph100 = static_cast<int>(ss.ph_target[g_stage_edit] * 100.0f);
+    if (ph100 < 500) ph100 = 500;
+    if (ph100 > 700) ph100 = 700;
+
+    int tds = ss.tds_target[g_stage_edit];
+    if (tds < 0) tds = 0;
+    if (tds > 2500) tds = 2500;
+
+    if (g_stage_name_lbl) {
+        lblf(g_stage_name_lbl, "Etapa %d | %s", g_stage_edit + 1, p.name);
+    }
+
+    if (g_sl_stage_ph) {
+        lv_slider_set_value(g_sl_stage_ph, ph100, LV_ANIM_OFF);
+    }
+
+    if (g_sl_stage_tds) {
+        lv_slider_set_value(g_sl_stage_tds, tds, LV_ANIM_OFF);
+    }
+
+    if (g_stage_hint_lbl) {
+        lblf(g_stage_hint_lbl,
+             "Base fw: pH %.2f-%.2f | PPM %d-%d",
+             p.ph_min, p.ph_max, p.ppm_min, p.ppm_max);
+    }
+
+    if (g_stage_msg_lbl) {
+        lv_label_set_text(g_stage_msg_lbl, "Edite y guarde objetivos locales HMI.");
+        lv_obj_set_style_text_color(g_stage_msg_lbl, C_MUT, 0);
+    }
+
+    stageEditorValueLabels();
+}
+
+void stage_select_cb(lv_event_t *e) {
+    int idx = static_cast<int>(reinterpret_cast<uintptr_t>(lv_event_get_user_data(e)));
+    stageEditorLoad(idx);
+    ui_render_bump_activity();
+}
+
+void stage_slider_cb(lv_event_t *) {
+    stageEditorValueLabels();
+    ui_render_bump_activity();
+}
+
+void stage_save_cb(lv_event_t *) {
+    if (!g_sl_stage_ph || !g_sl_stage_tds) return;
+
+    SystemSettings ss = readSettings();
+    const int idx = clamp_stage(g_stage_edit);
+
+    ss.ph_target[idx] = static_cast<float>(lv_slider_get_value(g_sl_stage_ph)) / 100.0f;
+    ss.tds_target[idx] = lv_slider_get_value(g_sl_stage_tds);
+
+    saveSettings(ss);
+
+    if (g_stage_msg_lbl) {
+        lv_label_set_text(g_stage_msg_lbl, "Objetivos guardados en ESP32.");
+        lv_obj_set_style_text_color(g_stage_msg_lbl, C_OK, 0);
+    }
+
+    ui_render_bump_activity();
+}
+
+void stage_apply_cb(lv_event_t *) {
+    if (!g_sl_stage_ph || !g_sl_stage_tds) return;
+
+    stage_save_cb(nullptr);
+
+    char cmd[24];
+    snprintf(cmd, sizeof(cmd), "CMD:SET_STAGE:%d", clamp_stage(g_stage_edit));
+    send_cmd(cmd);
+    send_cmd("CMD:GET_STATUS");
+
+    if (g_stage_msg_lbl) {
+        lv_label_set_text(g_stage_msg_lbl, "Etapa aplicada al controlador.");
+        lv_obj_set_style_text_color(g_stage_msg_lbl, C_ACC, 0);
+    }
+
+    ui_render_bump_activity();
+}
+
+void stage_small_btn(lv_obj_t *s, int idx, lv_coord_t x) {
+    lv_obj_t *b = mk_btn(s, x, 34, 56, 24, idx == 0);
+    lv_obj_t *l = lv_label_create(b);
+    char txt[8];
+    snprintf(txt, sizeof(txt), "E%d", idx + 1);
+    lv_label_set_text(l, txt);
+    lv_obj_center(l);
+    lv_obj_add_event_cb(
+        b,
+        stage_select_cb,
+        LV_EVENT_CLICKED,
+        reinterpret_cast<void *>(static_cast<uintptr_t>(idx))
+    );
 }
 
 void build_set_stage() {
     lv_obj_t *s = mk_screen();
-    hdr(s, "Objetivos por etapa", SCR_SETTINGS_HUB);
-    mk_label(s, "Ajuste de perfiles desde UNO R4 o firmware. Vista HMI:", 8, 36, F_S);
-    g_stage_card = mk_label(s, "--", 8, 64, F_S);
-    lv_label_set_long_mode(g_stage_card, LV_LABEL_LONG_WRAP);
-    lv_obj_set_width(g_stage_card, 304);
-    refreshStageCard();
+    hdr(s, "Objetivos etapa", SCR_SETTINGS_HUB);
+
+    g_stage_card = nullptr;
+
+    stage_small_btn(s, 0, 8);
+    stage_small_btn(s, 1, 69);
+    stage_small_btn(s, 2, 130);
+    stage_small_btn(s, 3, 191);
+    stage_small_btn(s, 4, 252);
+
+    g_stage_name_lbl = mk_label(s, "--", 8, 63, F_S);
+    lv_obj_set_width(g_stage_name_lbl, 304);
+    lv_label_set_long_mode(g_stage_name_lbl, LV_LABEL_LONG_DOT);
+    lv_obj_set_style_text_color(g_stage_name_lbl, C_ACC, 0);
+
+    mk_label(s, "pH", 8, 86, F_S);
+    g_sl_stage_ph = lv_slider_create(s);
+    lv_slider_set_range(g_sl_stage_ph, 500, 700);
+    lv_obj_set_pos(g_sl_stage_ph, 44, 92);
+    lv_obj_set_size(g_sl_stage_ph, 190, 10);
+    lv_obj_add_event_cb(g_sl_stage_ph, stage_slider_cb, LV_EVENT_VALUE_CHANGED, nullptr);
+
+    g_stage_ph_lbl = mk_label(s, "--", 242, 83, F_S);
+    lv_obj_set_width(g_stage_ph_lbl, 70);
+    lv_obj_set_style_text_align(g_stage_ph_lbl, LV_TEXT_ALIGN_RIGHT, 0);
+
+    mk_label(s, "TDS", 8, 120, F_S);
+    g_sl_stage_tds = lv_slider_create(s);
+    lv_slider_set_range(g_sl_stage_tds, 0, 2500);
+    lv_obj_set_pos(g_sl_stage_tds, 44, 126);
+    lv_obj_set_size(g_sl_stage_tds, 190, 10);
+    lv_obj_add_event_cb(g_sl_stage_tds, stage_slider_cb, LV_EVENT_VALUE_CHANGED, nullptr);
+
+    g_stage_tds_lbl = mk_label(s, "--", 242, 117, F_S);
+    lv_obj_set_width(g_stage_tds_lbl, 70);
+    lv_obj_set_style_text_align(g_stage_tds_lbl, LV_TEXT_ALIGN_RIGHT, 0);
+
+    lv_obj_t *save = mk_btn(s, 8, 154, 148, 28, false);
+    lv_label_set_text(lv_label_create(save), "Guardar");
+    lv_obj_center(lv_obj_get_child(save, 0));
+    lv_obj_add_event_cb(save, stage_save_cb, LV_EVENT_CLICKED, nullptr);
+
+    lv_obj_t *apply = mk_btn(s, 164, 154, 148, 28, true);
+    lv_label_set_text(lv_label_create(apply), "Aplicar etapa");
+    lv_obj_center(lv_obj_get_child(apply, 0));
+    lv_obj_add_event_cb(apply, stage_apply_cb, LV_EVENT_CLICKED, nullptr);
+
+    g_stage_hint_lbl = mk_label(s, "--", 8, 190, F_S);
+    lv_obj_set_width(g_stage_hint_lbl, 304);
+    lv_label_set_long_mode(g_stage_hint_lbl, LV_LABEL_LONG_DOT);
+    lv_obj_set_style_text_color(g_stage_hint_lbl, C_MUT, 0);
+
+    g_stage_msg_lbl = mk_label(s, "--", 8, 212, F_S);
+    lv_obj_set_width(g_stage_msg_lbl, 304);
+    lv_label_set_long_mode(g_stage_msg_lbl, LV_LABEL_LONG_DOT);
+    lv_obj_set_style_text_color(g_stage_msg_lbl, C_MUT, 0);
+
+    stageEditorLoad(0);
+
     g_scr[SCR_SET_STAGE] = s;
 }
 
@@ -1003,6 +1284,9 @@ void do_build(ScreenId id) {
         case SCR_SET_COMM: build_set_comm(); break;
         case SCR_SET_DISPLAY: build_set_display(); break;
         case SCR_SET_SOUND: build_set_sound(); break;
+        case SCR_SET_DOSING: build_set_dosing(); break;
+        case SCR_SET_CLIMATE: build_set_climate(); break;
+        case SCR_SET_SYSTEM: build_set_system(); break;
         case SCR_MAINTENANCE: build_maintenance(); break;
         case SCR_SYSTEM_INFO: build_info(); break;
         default: build_home(); break;

@@ -1,4 +1,4 @@
-#ifndef DATA_MODEL_H
+﻿#ifndef DATA_MODEL_H
 #define DATA_MODEL_H
 
 #include <Arduino.h>
@@ -69,10 +69,10 @@ struct WiFiConfig {
 
 struct SystemState {
     float ph          = 0.0f;
-    /** PPM/TDS entero derivado de telemetrÃƒÆ’Ã‚Â­a del controlador UNO R4 */
+    /** PPM/TDS entero derivado de telemetrÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â­a del controlador UNO R4 */
     int   tds         = 0;
     float temp_water  = 0.0f;
-    /** Temperatura NTC modulo PH-4502C (pin TO), Ãƒâ€šÃ‚Â°C */
+    /** Temperatura NTC modulo PH-4502C (pin TO), ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â°C */
     float temp_water_probe = 0.0f;
     float temp_air    = 0.0f;
     float hum_air     = 0.0f;
@@ -91,7 +91,7 @@ struct SystemState {
     bool state_pump_b        = false;
     bool state_ph_up         = false;
     bool state_ph_down       = false;
-    /** Buzzer / relÃƒÆ’Ã‚Â© BUZ del controlador UNO R4 */
+    /** Buzzer / relÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â© BUZ del controlador UNO R4 */
     bool state_buzzer        = false;
     bool auto_mode           = false;
     bool maintenance_mode    = false;
@@ -106,7 +106,7 @@ struct SystemState {
     /** Contadores del controlador I/O. Nombres legados preservados por compatibilidad. */
     uint8_t ph_corrections_mega = 0;
     uint8_t tds_corrections_mega = 0;
-    /** Hora RTC del controlador "HH:MM:SS" o vacÃƒÆ’Ã‚Â­o */
+    /** Hora RTC del controlador "HH:MM:SS" o vacÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â­o */
     char controller_clock[12] = "";
 
     /** DHT22 en UNO R4; si el STS no trae DHT= se asume true (compat firmware antiguo). */
@@ -140,7 +140,7 @@ struct SystemState {
     uint32_t uptime_seconds = 0;
     uint32_t history_count  = 0;
 
-    /** Historial corto de alarmas (mÃƒÆ’Ã‚Â¡s reciente primero) */
+    /** Historial corto de alarmas (mÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¡s reciente primero) */
     static constexpr int kAlarmHist = 5;
     char     alarm_history[kAlarmHist][40] = {};
     uint8_t  alarm_history_count = 0;
@@ -165,7 +165,7 @@ struct SystemSettings {
     float    vent_temp_off_c    = 26.0f;
     uint32_t uart_baud          = 115200;
     int8_t   uart_rx_pin        = 22;
-    int8_t   uart_tx_pin        = 27;
+    int8_t   uart_tx_pin        = 21;
     uint8_t  brightness_pct     = 100;
     bool     sound_enabled        = true;
     uint32_t ui_idle_timeout_ms  = 120000;
@@ -212,3 +212,4 @@ private:
 };
 
 #endif // DATA_MODEL_H
+

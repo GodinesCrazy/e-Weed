@@ -12,7 +12,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-/** CalibraciÃƒÆ’Ã‚Â³n viva (definida en main.cpp). */
+/** CalibraciÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â³n viva (definida en main.cpp). */
 extern CalibrationData g_calibration;
 
 namespace {
